@@ -1,0 +1,21 @@
+assignments_977909:
+  course: courses_201300
+  name: "Pre-Test: Adjectives vs. Adverbs"
+  correctness: "---\n30269: 0\n30300: 0\n31339: 0\n31548: 1\n31556: 0\n31712: 0\n31731: 0\n32205: 0\n32368: 0\n43313: 1\n"
+  type: "Assignment"
+  users: "users_2540954,users_2540956"
+
+assignments_978319:
+  course: courses_201300
+  name: "Post-Test: Adjectives vs. Adverbs"
+  correctness: "---\n30288: 0\n31361: 0\n31521: 0\n31552: 1\n31713: 0\n32224: 0\n32344: 1\n43193: 0\n43282: 0\n44959: 0\n"
+  type: "QuizPostTest"
+  users: "users_2540954,users_2540956"
+  previous_test_id: 1941
+
+assignments_978560:
+  course: courses_201300
+  name: "Comma Splices, Fragments, and Run-Ons"
+  correctness: "---\n915: 0\n1510: 0\n3003: 0\n3012: 0\n17984: 1\n"
+  type: "Assignment"
+  users: "users_2540954,users_2540956"

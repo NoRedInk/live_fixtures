@@ -1,0 +1,18 @@
+users_2540939:
+  email: <%= next_email("teacher@noredink.com") %>
+  password: "$2a$10$3tIjCx2p4KrGUaOCSSGTVe4S/xCaJbzSgo6v3olEDDXplP.mcAmgK"
+  last_login: 2015-12-21 20:42:15
+  relevant_terms: "2077,2327"
+
+users_2540954:
+  email: ""
+  username: <%= next_username("jgiraffe") %>
+  password: "$2a$10$FyvO.ydk5cAOIPs/.gNbn.bOikrZpjpyJcfWtk1NphaIWJ9kNlxgS"
+  relevant_terms: "2321,2077"
+
+users_2540956:
+  email: ""
+  username: <%= next_username("kchameleon") %>
+  password: "$2a$10$ZWY/K.EvvYNVXue40us0auD1wFr8/tN70.Wh.GL5ft0Xq92R8RZAe"
+  last_login: 2015-09-02 20:50:09
+  relevant_terms: "1744"

@@ -1,0 +1,6 @@
+courses_201300:
+  name: "Honors English 7"
+  invite_code: <%= unique_invite_code %>
+  user: users_2540939
+  created_at: 2015-07-27 21:47:50
+  premium_license_id: 3
