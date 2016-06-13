@@ -1,0 +1,18 @@
+tables_977909:
+  cafe: cafes_201300
+  name: "Meadow"
+  type: "Table"
+  dogs: "dogs_2540954,dogs_2540956"
+
+tables_978319:
+  cafe: cafes_201300
+  name: "River"
+  type: "LowTable"
+  dogs: "dogs_2540954,dogs_2540956"
+  low_chair_id: 1941
+
+tables_978560:
+  cafe: cafes_201300
+  name: "Riverbank"
+  type: "Table"
+  dogs: "dogs_2540954,dogs_2540956"

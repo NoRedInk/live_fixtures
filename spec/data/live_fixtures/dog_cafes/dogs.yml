@@ -1,0 +1,18 @@
+dogs_2540939:
+  email: <%= next_email("wuffy@example.com") %>
+  password: "$2a$10$056NY3pDvQ5xly.Dyh/RV.vHmT8P9PS.jQxp0Gy3hKN1EqFL/E7Mi"
+  last_active: 2015-12-21 20:42:15
+  flavors: "2077,2327"
+
+dogs_2540954:
+  email: ""
+  name: <%= next_dogname("jgiraffe") %>
+  password: "$2a$10$Dlam8YNk3kC7BVJVLL8pMudMhuST5FiEAnwfhhA27ceqXRtljJPlC"
+  flavors: "2321,2077"
+
+dogs_2540956:
+  email: ""
+  name: <%= next_dogname("kchameleon") %>
+  password: "$2a$10$RBbmWIfqyT9KRFCt9tze6eX461hdr486gt6OB9XumsS85bITSnWwu"
+  last_active: 2015-09-02 20:50:09
+  flavors: "1744"
