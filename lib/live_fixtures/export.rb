@@ -41,9 +41,10 @@ module LiveFixtures::Export
   class ProgressBarIterator
     def initialize(models)
       @models = models
-      @bar = ProgressBar.create total:models.size,
-                                title: models.first.class.name.pluralize,
-                                format:'%t: |%B| %P% %E'
+      @bar = LiveFixtures.get_progress_bar(
+        total:models.size,
+        title: models.first.class.name
+      )
     end
 
     def each

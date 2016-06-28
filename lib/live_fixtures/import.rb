@@ -106,9 +106,10 @@ class LiveFixtures::Import
   class ProgressBarIterator
     def initialize(ff)
       @ff = ff
-      @bar = ProgressBar.create total:ff.fixtures.size,
-                                title: ff.model_class.name,
-                                format:'%t: |%B| %P% %E'
+      @bar = LiveFixtures.get_progress_bar(
+        total:ff.fixtures.size,
+        title: ff.model_class.name
+      )
     end
 
     def each
