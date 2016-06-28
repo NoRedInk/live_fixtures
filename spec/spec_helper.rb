@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require "active_record"
-require 'progressbar'
+require 'ruby-progressbar'
 require 'temping'
 require 'live_fixtures'
 require 'byebug'
