@@ -11,7 +11,8 @@ module LiveFixtures
     ProgressBar.create(
       total: total,
       title: title,
-      format:'%t: |%B| %P% %E'
+      format:'%t: |%B| %P% %E',
+      throttle_rate: 0.1
     )
   end
 end
