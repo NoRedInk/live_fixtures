@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.summary       = %q{Tools for exporting and importing between databases managed by ActiveRecord.}
   spec.license       = "MIT"
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         =  Dir['CHANGELOG.md', 'MIT-LICENSE', 'README.md', 'lib/**/*']
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
