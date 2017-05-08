@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["jleven"]
   spec.email         = ["josh@noredink.com"]
 
-  spec.required_ruby_version = '>= 1.9.3'
+  spec.required_ruby_version = '>= 2.1'
 
   spec.summary       = %q{Tools for exporting and importing between databases managed by ActiveRecord.}
   spec.license       = "MIT"
