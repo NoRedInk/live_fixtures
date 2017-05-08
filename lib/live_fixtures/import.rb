@@ -65,8 +65,8 @@ class LiveFixtures::Import
     @label_to_id = {}
   end
 
-  # https://github.com/rails/rails/blob/3-2-stable/activerecord/lib/active_record/fixtures.rb#L462
-  # The very similar method: ActiveRecord::Fixtures.create_fixtures has the
+  # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
+  # The very similar method: ActiveRecord::FixtureSet.create_fixtures has the
   # unfortunate side effect of truncating each table!!
   #
   # Therefore, we have reproduced the relevant sections here, without DELETEs,
