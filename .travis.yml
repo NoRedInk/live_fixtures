@@ -1,4 +1,11 @@
 language: ruby
 rvm:
-  - 2.3.0
-before_install: gem install bundler -v 1.11.2
+  - 1.9
+  - 2.0
+  - 2.1
+  - 2.2
+  - 2.3
+  - 2.4
+before_install: gem install bundler -v 1.14.6
+cache: bundler
+sudo: false
