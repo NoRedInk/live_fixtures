@@ -1,4 +1,10 @@
+dist: trusty
 language: ruby
 rvm:
-  - 2.3.0
-before_install: gem install bundler -v 1.11.2
+  - 2.1
+  - 2.2
+  - 2.3.4
+  - 2.4.1
+before_install: gem install bundler -v 1.14.6
+cache: bundler
+sudo: false

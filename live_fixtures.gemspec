@@ -9,6 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["jleven"]
   spec.email         = ["josh@noredink.com"]
 
+  spec.required_ruby_version = '>= 2.1'
+
   spec.summary       = %q{Tools for exporting and importing between databases managed by ActiveRecord.}
   spec.license       = "MIT"
 
@@ -17,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activerecord", "~> 3.2"
+  spec.add_dependency "activerecord", "~> 4.2"
   spec.add_dependency "ruby-progressbar"
   spec.add_development_dependency "bundler", "~> 1.11"
   spec.add_development_dependency "rake", "~> 10.0"

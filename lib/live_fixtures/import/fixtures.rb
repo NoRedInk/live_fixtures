@@ -8,15 +8,15 @@ class LiveFixtures::Import
     attr_reader :ar_fixtures
 
     def initialize(connection, table_name, class_name, filepath, label_to_id)
-      @ar_fixtures = ActiveRecord::Fixtures.new connection,
-                                                table_name,
-                                                class_name,
-                                                filepath
+      @ar_fixtures = ActiveRecord::FixtureSet.new connection,
+        table_name,
+        class_name,
+        filepath
       @label_to_id = label_to_id
     end
 
-    # https://github.com/rails/rails/blob/3-2-stable/activerecord/lib/active_record/fixtures.rb#L569
-    # Rewritten to take advantage of @label_to_id instead of AR::Fixtures#identify,
+    # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L611
+    # Rewritten to take advantage of @label_to_id instead of AR::FixtureSet#identify,
     # and to make an iterator.
     #
     # Iterator which yields [table_name, label, row] for each fixture
@@ -37,7 +37,7 @@ class LiveFixtures::Import
               maybe_convert_association_to_foreign_key row, association
 
             when :has_and_belongs_to_many
-              join_table_name = association.options[:join_table]
+              join_table_name = association.join_table
 
               targets = row.delete(association.name.to_s)
               targets = targets.split(/\s*,\s*/) unless targets.is_a?(Array)
