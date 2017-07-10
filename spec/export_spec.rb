@@ -3,8 +3,11 @@ require 'spec_helper'
 Temping.create :trick do
   with_columns do |t|
     t.string :name
+    t.text :prerequisites
     t.boolean :frisbee
   end
+
+  serialize :prerequisites, JSON
 end
 
 Temping.create :level do
@@ -58,10 +61,12 @@ describe LiveFixtures::Export do
       [
         (Trick.create do |t|
            t.name = "Trick 1"
+           t.prerequisites = {}
            t.frisbee = false
          end),
         (Trick.create do |t|
            t.name = "Trick 2"
+           t.prerequisites = {trick: "Trick 1"}
            t.frisbee = true
          end),
       ]
@@ -115,6 +120,7 @@ levels_#{level.id}:
         <<-YML
 tricks_#{trick.id}:
   name: "#{trick.name}"
+  prerequisites: #{trick.prerequisites.to_json.inspect}
   frisbee: #{trick.frisbee}
 
         YML
