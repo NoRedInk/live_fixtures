@@ -120,7 +120,8 @@ levels_#{level.id}:
         <<-YML
 tricks_#{trick.id}:
   name: "#{trick.name}"
-  prerequisites: #{trick.prerequisites.to_json.inspect}
+  prerequisites: >-
+    #{trick.prerequisites.to_json}
   frisbee: #{trick.frisbee}
 
         YML
