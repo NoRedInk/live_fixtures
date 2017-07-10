@@ -40,9 +40,8 @@ module LiveFixtures::Export::Fixture
       next if %w{id}.include? name
       next if value.nil?
 
-      if model.class.serialized_attributes.has_key? name
-        serializer = model.class.serialized_attributes[name]
-        value = serializer.dump(value)
+      if model.class.type_for_attribute(name).is_a? ActiveRecord::Type::Serialized
+        value = model.class.type_for_attribute(name).type_cast_for_database value
       end
 
       yml_value ||= case value

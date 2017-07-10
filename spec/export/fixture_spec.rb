@@ -11,14 +11,14 @@ describe LiveFixtures::Export::Fixture do
     let(:model) { new_model(table_name, attributes) }
     let(:table_name) { 'tables' }
     let(:attributes) { {'key' => 'value'} }
-    let(:serialized_attributes) { {} }
+    let(:type_for_attribute) { instance_double('ActiveRecord::Type') }
     let(:references) { [] }
     let(:more_attributes) { {} }
 
     def new_model(table_name, attributes={})
       double('Model',
              id: rand(1_000_000),
-             class: double(table_name:table_name, serialized_attributes: serialized_attributes),
+             class: double(table_name:table_name, type_for_attribute: type_for_attribute),
              attributes: attributes)
     end
 
