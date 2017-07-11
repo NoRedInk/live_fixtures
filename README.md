@@ -8,9 +8,7 @@ UNACCEPTABLE for use with a production db. LiveFixtures works around this.
 
 Add this line to your application's Gemfile:
 
-```ruby
-gem 'live_fixtures'
-```
+    gem 'live_fixtures'
 
 And then execute:
 
