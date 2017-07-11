@@ -22,7 +22,27 @@ Or install it yourself as:
 
 ## Usage
 
-The export module is meant to be `include`ed into your export class.
+The `LiveFixtures::Export` module is meant to be `include`ed into your export class.
+
+```
+class Export::User
+  include LiveFixtures::Export
+
+  def export(user_id)
+    set_export_dir "#{Rails.root}/data/export/user/#{user_id}"
+
+    export_users_and_courses(user_id)
+  end
+
+  def export_users_and_posts(user_id)
+    export_fixtures(User.where(id: user_id))
+
+    export_fixtures courses, :user do |_|
+      { "invite_code" => Template.new("<%= Export::Helper.unique_invite_code %>") }
+    end
+  end
+end
+```
 
 1. Call #set_export_dir to set the dir where files should be created.
    If the dir does not already exist, it will be created for you.
