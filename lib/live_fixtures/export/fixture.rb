@@ -40,30 +40,41 @@ module LiveFixtures::Export::Fixture
       next if %w{id}.include? name
       next if value.nil?
 
-      if model.class.type_for_attribute(name).is_a? ActiveRecord::Type::Serialized
-        value = model.class.type_for_attribute(name).type_cast_for_database value
-        yml_value = [">-", value.to_s.indent(4)].join("\n")
-      end
-
-      yml_value ||= case value
-                      when Time, DateTime
-                        value.utc.to_s(:db)
-                      when Date
-                        value.to_s(:db)
-                      when Hash
-                        value.to_yaml.inspect
-                      when String
-                        value.inspect
-                      when LiveFixtures::Export::Template
-                        value.code
-                      when LiveFixtures::Export::Reference
-                        name, value = value.name, value.value
-                        "#{value.class.table_name}_#{value.id}"
-                      else
-                        value.to_s
-                    end
-
-      "#{name}: " + yml_value
+      serialize_attribute(model, name, value)
     end.compact.join("\n  ")
+  end
+
+  private_class_method def serialize_attribute(model, name, value)
+    attribute_type = model.class.type_for_attribute(name)
+
+    if attribute_type.is_a? ActiveRecord::Type::Serialized
+      value = attribute_type.type_cast_for_database value
+
+      ["#{name}: >-", value.to_s.indent(4)].join("\n")
+    elsif value.is_a? LiveFixtures::Export::Reference
+      "#{value.name}: #{yml_value(value)}"
+    else
+      "#{name}: #{yml_value(value)}"
+    end
+  end
+
+  private_class_method def yml_value(value)
+    case value
+    when Time, DateTime
+      value.utc.to_s(:db)
+    when Date
+      value.to_s(:db)
+    when Hash
+      value.to_yaml.inspect
+    when String
+      value.inspect
+    when LiveFixtures::Export::Template
+      value.code
+    when LiveFixtures::Export::Reference
+      reference_value = value.value
+      "#{reference_value.class.table_name}_#{reference_value.id}"
+    else
+      value.to_s
+    end
   end
 end
