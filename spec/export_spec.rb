@@ -4,10 +4,12 @@ Temping.create :trick do
   with_columns do |t|
     t.string :name
     t.text :prerequisites
+    t.text :instructions
     t.boolean :frisbee
   end
 
   serialize :prerequisites, JSON
+  serialize :instructions
 end
 
 Temping.create :level do
@@ -62,11 +64,13 @@ describe LiveFixtures::Export do
         (Trick.create do |t|
            t.name = "Trick 1"
            t.prerequisites = {}
+           t.instructions = ["Sit", "Shake", "Sit"]
            t.frisbee = false
          end),
         (Trick.create do |t|
            t.name = "Trick 2"
            t.prerequisites = {trick: "Trick 1"}
+           t.instructions = []
            t.frisbee = true
          end),
       ]
@@ -121,7 +125,9 @@ levels_#{level.id}:
 tricks_#{trick.id}:
   name: "#{trick.name}"
   prerequisites: >-
-    #{trick.prerequisites.to_json}
+#{trick.prerequisites.to_json.indent(4)}
+  instructions: >-
+#{trick.instructions.to_yaml.indent(4)}
   frisbee: #{trick.frisbee}
 
         YML

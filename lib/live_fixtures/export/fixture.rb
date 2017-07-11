@@ -42,7 +42,7 @@ module LiveFixtures::Export::Fixture
 
       if model.class.type_for_attribute(name).is_a? ActiveRecord::Type::Serialized
         value = model.class.type_for_attribute(name).type_cast_for_database value
-        yml_value = [">-", value].join("\n" + " " * 4)
+        yml_value = [">-", value.to_s.indent(4)].join("\n")
       end
 
       yml_value ||= case value
