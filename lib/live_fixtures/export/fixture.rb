@@ -50,7 +50,7 @@ module LiveFixtures::Export::Fixture
     if attribute_type.is_a? ActiveRecord::Type::Serialized
       value = attribute_type.type_cast_for_database value
 
-      ["#{name}: >-", value.to_s.indent(4)].join("\n")
+      "#{name}: >-\n#{value.to_s.indent(4)}"
     elsif value.is_a? LiveFixtures::Export::Reference
       "#{value.name}: #{yml_value(value)}"
     else
