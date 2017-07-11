@@ -22,7 +22,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+The export module is meant to be `include`ed into your export class.
+
+1. Call #set_export_dir to set the dir where files should be created.
+   If the dir does not already exist, it will be created for you.
+
+2. Then call #export_fixtures for each db table, which will produce
+   one yml file for each db table. Do *not* call export_fixtures multiple
+   times for the same db table - that will overwrite the file each time!
 
 ## Motivation
 
@@ -92,4 +99,3 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/[USERN
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
