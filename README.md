@@ -1,8 +1,8 @@
 # LiveFixtures
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/live_fixtures`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+ActiveRecord::Fixtures are a powerful way of populating data in a db;
+however, its strategy for handling primary keys and associations is
+UNACCEPTABLE for use with a production db. LiveFixtures works around this.
 
 ## Installation
 
@@ -23,6 +23,60 @@ Or install it yourself as:
 ## Usage
 
 TODO: Write usage instructions here
+
+## Motivation
+
+
+
+### Here's how ActiveRecord::Fixtures work
+
+Each record is assigned a label in its yml file. Primary key values are
+assigned using a guid algorithm that maps a label to a consistent integer
+between 1 and 2^30-1. Primary keys can then be assigned before saving any
+records to the db.
+
+Why would they do this? Because, this enables us to use labels in the
+Fixture yml files to refer to associations. For example:
+
+      <users.yml>
+      bob:
+        username: thebob
+
+      <posts.yml>
+      hello:
+        message: Hello everyone!
+        user: bob
+
+
+
+The ActiveRecord::Fixture system first converts every instance of `bob` and
+`hello` into an integer using ActiveRecord::Fixture#identify, and then can
+save the records IN ANY ORDER and know that all foreign keys will be valid.
+
+There is a big problem with this. In a test db, each table is empty and so the
+odds of inserting a few dozen records causing a primary key collision is
+very small. However, for a production table with a hundred million rows, this
+is no longer the case! Collisions abound and db insertion fails.
+
+Also, auto-increment primary keys will continue from the LARGEST existing
+primary key value. If we insert a record at 1,000,000,000 - we've reduced the
+total number of records we can store in that table in half. Fine for a test db
+but not ideal for production.
+
+
+### LiveFixtures work differently
+
+Since we want to be able to take advantage of normal auto-increment behavior,
+we cannot know the primary keys of each record before saving it to the db.
+Instead, we save each record, and then maintain a mapping (`@label_to_id`)
+from that record's label (`bob`), to its primary key (`213`). Later, when
+another record (`hello`) references `bob`, we can use this mapping to look up
+the primary key for `bob` before saving `hello`.
+
+This means that the order we insert records into the db matters: `bob` must
+be inserted before `hello`! This order is defined in INSERT_ORDER, and
+reflected in the order of the `@table_names` array.
+
 
 ## Development
 
