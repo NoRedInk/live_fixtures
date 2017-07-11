@@ -72,6 +72,9 @@ The `LiveFixtures::Import` class allows you to specify the location of your fixt
 
 ## Motivation
 
+ActiveRecord::Fixtures is designed to import data into a test database, and its practices of truncating tables and randomly generating primary keys work well in that setting.
+
+LiveFixtures is designed for importing data into a production database, where we cannot truncate the tables and where inserting records with randomly generated primary keys will cause collisions and waste space.
 
 ### Here's how ActiveRecord::Fixtures work
 
