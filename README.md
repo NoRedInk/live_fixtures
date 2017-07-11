@@ -20,27 +20,31 @@ Or install it yourself as:
 
 ## Usage
 
-The `LiveFixtures::Export` module is meant to be `include`ed into your export class.
+### Exporting
 
-```
-class Export::User
-  include LiveFixtures::Export
+The `LiveFixtures::Export` module is meant to be included into your export class.
 
-  def export(user_id)
-    set_export_dir "#{Rails.root}/data/export/user/#{user_id}"
 
-    export_users_and_courses(user_id)
-  end
+    class Export::User
+      include LiveFixtures::Export
 
-  def export_users_and_posts(user_id)
-    export_fixtures(User.where(id: user_id))
+      def export(user_id)
+        set_export_dir "#{Rails.root}/data/export/user/#{user_id}/"
 
-    export_fixtures courses, :user do |_|
-      { "invite_code" => Template.new("<%= Export::Helper.unique_invite_code %>") }
+        export_user_and_posts(user_id)
+      end
+
+      def export_user_and_posts(user_id)
+        user = User.find(user_id)
+        export_fixtures([user])
+
+        export_fixtures user.posts, :user do |post|
+          { "likes" => post.likes.count,
+            "unique_url" => Template.new("<%= Export::Helper.unique_url %>") }
+        end
+      end
     end
-  end
-end
-```
+
 
 1. Call #set_export_dir to set the dir where files should be created.
    If the dir does not already exist, it will be created for you.
@@ -48,6 +52,8 @@ end
 2. Then call #export_fixtures for each db table, which will produce
    one yml file for each db table. Do *not* call export_fixtures multiple
    times for the same db table - that will overwrite the file each time!
+
+3. For advanced usage, read the sections about Additional Attributes, References, and Templates.
 
 ## Motivation
 
