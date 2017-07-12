@@ -30,7 +30,7 @@ class LiveFixtures::Import
   # unfortunate side effect of truncating each table!!
   #
   # Therefore, we have reproduced the relevant sections here, without DELETEs,
-  # with calling `LF::Import::Fixtures#each_table_row_with_label` instead of
+  # with calling {LiveFixtures::Import::Fixtures#each_table_row_with_label} instead of
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
   def import_all(class_names = {})
