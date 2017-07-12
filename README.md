@@ -119,7 +119,7 @@ We can use a block to add more attributes to a fixture. Each model is passed to 
 
 ### References
 
-References allow fixtures to capture a model's associations, so they can be corrrectly re-established on import.
+References allow fixtures to capture a model's associations, so they can be correctly re-established on import.
 
 When we export a fixture for a post above, we'd expect to see an attribute `user_id`
 
