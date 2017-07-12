@@ -69,7 +69,7 @@ The `LiveFixtures::Import` class allows you to specify the location of your fixt
       end
     end
 
-### Advanced Usage
+## Advanced Usage
 
 The following topics work with the following schema and exporter:
 
