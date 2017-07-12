@@ -1,8 +1,17 @@
 # LiveFixtures
 
-ActiveRecord::Fixtures are a powerful way of populating data in a db;
-however, its strategy for handling primary keys and associations is
-[UNACCEPTABLE](#Motivation) for use with a production db. LiveFixtures works around this.
+Like ActiveRecord::Fixtures, but for production.
+
+> A test fixture is a fixed state of a set of objects used as a baseline for running tests.
+> The purpose of a test fixture is to ensure that there is a well known and fixed environment in which tests are run so that results are repeatable.
+>
+> [https://github.com/junit-team/junit4/wiki/test-fixtures](https://github.com/junit-team/junit4/wiki/test-fixtures)
+
+[ActiveRecord::Fixtures](http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html) provide a powerful way to populate a database with test fixtures, but its strategy for handling primary keys and associations is not intended for use with a production db.
+
+LiveFixtures uses a different strategy that means it is safer to use in a live environment.
+
+For more information, see [the motivation section below](#Motivation).
 
 ## Installation
 
