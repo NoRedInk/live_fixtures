@@ -69,6 +69,105 @@ The `LiveFixtures::Import` class allows you to specify the location of your fixt
       end
     end
 
+### Advanced Usage
+
+The following topics work with the following schema and exporter:
+
+    class User < ActiveRecord::Base
+      has_many :posts
+    end
+
+    class Post < ActiveRecord::Base
+      belongs_to :user
+    end
+
+    class YourExporter
+      include LiveFixtures::Export
+      def initialize(fixture_path)
+        set_export_dir fixture_path
+      end
+
+      def export_models(models, references = [], &additional_attributes)
+        export_fixtures(models, references, &additional_attributes)
+      end
+    end
+
+### Additional Attributes
+
+We can use a block to add more attributes to a fixture. Each model is passed to the block as an argument, and the block should return a hash of additional arguments.
+
+    dev_ops_posts = Post.where(topic: "Dev Ops")
+    exporter = YourExporter.new("fixtures/")
+    exporter.export_models(dev_ops_posts) do |post|
+      { summary: PostSummarizer.summarize(post) }
+    end
+
+    # In our fixtures/posts.yml file
+    posts_1234:
+      ...
+      user_id: 5678
+      summary: "Dev ops is cool."
+
+### References
+
+References allow fixtures to capture a model's associations, so they can be corrrectly re-established on import.
+
+When we export a fixture for a post above, we'd expect to see an attribute `user_id`
+
+    post = Post.find(1234)
+    post.user_id = 5678
+    post.save!
+    exporter = YourExporter.new("fixtures/")
+    exporter.export_models([post])
+
+    # In our posts.yml file
+    posts_1234:
+      ...
+      user_id: 5678
+
+
+If we import this post, it will still have 5678 for its user_id foreign key. This may or may not be the desired outcome.
+
+If we pass `:user` as references, LiveFixtures will replace the foreign key with a reference, so that the association can be correctly re-established on import:
+
+    post = Post.find(1234)
+    post.user_id = 5678
+    post.save!
+    exporter = YourExporter.new("fixtures/")
+    exporter.export_models([post], :user)
+    exporter.export_models([post.user])
+
+    # In our posts.yml file
+    posts_1234:
+      ...
+      user: users_5678
+
+    # In our users.yml file
+    users_5678:
+      ...
+
+When we import these fixtures using the correct `insert_order` (`['users', 'posts']`), the newly imported post will belong to the newly imported user, no matter what their new ids are.
+
+Currently, this only works for associations that return a single record (:belongs_to and :has_one).
+
+### Templates
+
+Templates allow you to export fixtures containing erb, that will be evaluated at the time of fixture import.
+
+    posts = Post.where(user_id: 5678
+    exporter = YourExporter.new("fixtures/")
+    exporter.export_models([post]) do |post|
+      { unique_promo_code: Template.new("<%= PromoCodeGenerator.unique_promo_code(#{post.id}) %>")
+    end
+
+    # In our fixtures/posts.yml file
+    posts_1234:
+      ...
+      user_id: 5678
+      unique_promo_code: <%= PromoCodeGenerator.unique_promo_code(1234) %>
+
+In the example above, we'd be able to generate a new unique promo code for each post as we import them.
+
 
 ## Motivation
 
