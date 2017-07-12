@@ -1,6 +1,16 @@
+# An object that facilitates the import of fixtures into a database.
 class LiveFixtures::Import
   NO_LABEL = nil
 
+  # Instantiate a new Import with the directory containing your fixtures, and
+  # the order in which to import them. The order should ensure fixtures
+  # containing references to another fixture are imported AFTER the referenced
+  # fixture.
+  # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
+  # @param root_path [String] path to the directory containing the yml files to import.
+  # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
+  # @return [LiveFixtures::Import] an importer
+  # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
@@ -13,13 +23,16 @@ class LiveFixtures::Import
     @label_to_id = {}
   end
 
-  # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
+  # Within a transaction, import all the fixtures into the database.
+  # @param class_names [Hash{Symbol => String}] a mapping table name => Model class, for any that don't follow convention.
+  #
   # The very similar method: ActiveRecord::FixtureSet.create_fixtures has the
   # unfortunate side effect of truncating each table!!
   #
   # Therefore, we have reproduced the relevant sections here, without DELETEs,
   # with calling `LF::Import::Fixtures#each_table_row_with_label` instead of
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
+  # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
   def import_all(class_names = {})
     @table_names.each { |n|
       class_names[n.tr('/', '_').to_sym] ||= n.classify if n.include?('/')
