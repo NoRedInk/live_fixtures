@@ -8,6 +8,10 @@
 #    times for the same db table - that will overwrite the file each time!
 
 module LiveFixtures::Export
+  # Templates allow you to export fixtures containing erb, that will be evaluated at the time of fixture import.
+  # You should initialize them with a String containing the erb to evaluate, like
+  # @example A template with export and import times.
+  #    Template.new("<%= \"I was exported at #{Time.now} and imported at \" + Time.now.to_s %>")
   Template  = Struct.new(:code)
   Reference = Struct.new(:name, :value)
 
