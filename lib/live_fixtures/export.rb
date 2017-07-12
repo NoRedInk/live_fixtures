@@ -31,10 +31,15 @@ module LiveFixtures::Export
 
   ##
   # Export models to a yml file named after the corresponding table.
+  # @param models [Enumerable] an Enumerable containing ActiveRecord models.
+  # @param with_references [Array<Symbol>] the associations whose foreign_keys should be replaced with references.
   #
   # Takes an optional block that will be invoked for each model.
   # The block should return a hash of attributes to be merged and
   # saved with the model's attributes.
+  # @yield [model] an optional block that will be invoked for each model.
+  # @yieldparam model [ActiveRecord::Base] each successive model.
+  # @yieldreturn [Hash{String => Object}] a hash of attributes to be merged and saved with the model's attributes.
   def export_fixtures(models, with_references = [])
     return unless models.present?
 
