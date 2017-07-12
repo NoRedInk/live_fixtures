@@ -13,6 +13,10 @@ module LiveFixtures::Export
   # @example A template with export and import times.
   #    Template.new("<%= \"I was exported at #{Time.now} and imported at \" + Time.now.to_s %>")
   Template  = Struct.new(:code)
+
+  # References represent associations between fixtures, in the same way that foreign_keys do for records.
+  # These will be initialized for you based on the contents of `with_references` passed to `export_fixtures`.
+  # They will be initialized with the name of the association (a Symbol) and the particular associated model.
   Reference = Struct.new(:name, :value)
 
   private
