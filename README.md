@@ -2,7 +2,7 @@
 
 ActiveRecord::Fixtures are a powerful way of populating data in a db;
 however, its strategy for handling primary keys and associations is
-UNACCEPTABLE for use with a production db. LiveFixtures works around this.
+[UNACCEPTABLE](#Motivation) for use with a production db. LiveFixtures works around this.
 
 ## Installation
 
