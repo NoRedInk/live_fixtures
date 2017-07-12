@@ -180,9 +180,11 @@ In the example above, we'd be able to generate a new unique promo code for each 
 
 ## Motivation
 
-ActiveRecord::Fixtures is designed to import data into a test database, and its practices of truncating tables and randomly generating primary keys work well in that setting.
+One particular challenge when working with fixtures is describing associations between records. When they're in the database, records have unique primary keys, and associations are captured using foreign keys (references to the associated record's primary key). For example, a row in the `posts` table may have a column `user_id`. If it's value is `1234`, it indicated that `Post` belongs to the `User` with id `1234`.
 
-LiveFixtures is designed for importing data into a production database, where we cannot truncate the tables and where inserting records with randomly generated primary keys will cause collisions and waste space.
+How can we model associations when fixtures are removed from the database? It's not enough to just serialize the foreign keys, as we expect each record to have a different primary key each time it is imported into a database.
+
+ActiveRecord::Fixtures answers this question in a way that is very effective for a test database, but that is not safe for a live database.
 
 ### Here's how ActiveRecord::Fixtures work
 
