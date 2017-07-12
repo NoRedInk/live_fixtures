@@ -21,6 +21,9 @@ module LiveFixtures::Export
 
   private
 
+  # Specify the directory into which to export the yml files containing your fixtures.
+  # The directory will be created if it does not yet exist.
+  # @param dir [String] a path to a directory into which the fixtures will be exported.
   def set_export_dir(dir)
     @dir = dir
     FileUtils.mkdir_p(@dir) unless File.directory?(@dir)
