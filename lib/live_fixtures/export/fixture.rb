@@ -1,5 +1,13 @@
+# Exposes functionality to serialize an ActiveRecord record (a model) into a
+# YAML fixture.
 module LiveFixtures::Export::Fixture
   module_function
+  # YAML-Serializes the provided model, including any references and additional
+  # attribtues.
+  # @param model [ActiveRecord::Base] an ActiveRecord record to serialize
+  # @param references [Symbol, Array<Symbol>] the names of associations whose foreign_keys should be replaced with references
+  # @param more_attributes [Hash{String => Time, DateTime, Date, Hash, String, LiveFixtures::Export::Template, LiveFixtures::Export::Reference, #to_s}] a hash of additional attributes to serialize with each record.
+  # @return [String] the model serialized in YAML, with specified foreign_keys replaced by references, including additional attributes.
   def to_yaml(model, references = [], more_attributes = {})
     table_name = model.class.table_name
 

@@ -1,12 +1,16 @@
 require 'active_record/fixtures'
 
-#rubocop:disable Style/PerlBackrefs
-
 class LiveFixtures::Import
   class Fixtures
     delegate :model_class, :table_name, :fixtures, to: :ar_fixtures
+    # ActiveRecord::FixtureSet for delegation
     attr_reader :ar_fixtures
 
+    # @param connection [ActiveRecord::ConnectionAdapters::AbstractAdapter] connection to the database into which to import the data.
+    # @param table_name [String] name of the database table to populate with models
+    # @param class_name [Constant] the model's class name
+    # @param filepath [String] path to the yml file containing the fixtures
+    # @param label_to_id [Hash{String => Int}] map from a reference's label to its new id.
     def initialize(connection, table_name, class_name, filepath, label_to_id)
       @ar_fixtures = ActiveRecord::FixtureSet.new connection,
         table_name,
@@ -15,12 +19,16 @@ class LiveFixtures::Import
       @label_to_id = label_to_id
     end
 
-    # https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L611
     # Rewritten to take advantage of @label_to_id instead of AR::FixtureSet#identify,
     # and to make an iterator.
     #
+    # @yieldparam table_name [String] the database table's name
+    # @yieldparam label [String] the label for the model being currently imported
+    # @yieldparam row [Hash{String => Value}] the model's attributes to be imported
     # Iterator which yields [table_name, label, row] for each fixture
-    # (and for any implicit join table records)
+    # (and for any implicit join table records). The block is expected to insert
+    # the row and update @label_to_id with the record's newly assigned id.
+    # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L611
     def each_table_row_with_label
       join_table_rows = Hash.new { |h,table| h[table] = [] }
 
