@@ -47,8 +47,8 @@ module LiveFixtures::Export::Fixture
   private_class_method def serialize_attribute(model, name, value)
     attribute_type = model.class.type_for_attribute(name)
 
-    if attribute_type.is_a? ActiveRecord::Type::Serialized
-      value = attribute_type.type_cast_for_database value
+    if attribute_type.is_a?(ActiveRecord::Type::Serialized)
+      value = attribute_type.type_cast_for_database(value) unless value.is_a?(String)
 
       "#{name}: >-\n#{value.to_s.indent(4)}"
     elsif value.is_a? LiveFixtures::Export::Reference
