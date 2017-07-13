@@ -116,7 +116,7 @@ levels_#{level.id}:
   score: #{level.score}
   dog_id: #{level.dog_id}
   trick: tricks_#{level.trick_id}
-  rubric: >-
+  rubric: |-
 #{level.rubric.to_yaml.indent(4)}
   created_at: #{level.created_at.utc.to_s(:db)}
   hash: #{level.hash}
@@ -132,9 +132,9 @@ levels_#{level.id}:
         <<-YML
 tricks_#{trick.id}:
   name: "#{trick.name}"
-  prerequisites: >-
+  prerequisites: |-
 #{trick.prerequisites.to_json.indent(4)}
-  instructions: >-
+  instructions: |-
 #{trick.instructions.to_yaml.indent(4)}
   frisbee: #{trick.frisbee}
 

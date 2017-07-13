@@ -1,10 +1,10 @@
 cafes_201300:
   name: "Elm Street Cafe"
   pass_code: <%= unique_pass_code %>
-  menu: >-
+  menu: |-
     {"bone":2,"treat":3,"water":0}
 
-  chefs: >-
+  chefs: |-
     ---
       - "Emilio"
       - "Gretchen"
