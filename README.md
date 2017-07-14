@@ -11,7 +11,7 @@ Like ActiveRecord::Fixtures, but for production.
 
 LiveFixtures uses a different strategy that means it is safer to use in a live environment.
 
-For more information, see [the motivation section below](#Motivation).
+For more information, see [the motivation section below](#motivation).
 
 ## Installation
 
