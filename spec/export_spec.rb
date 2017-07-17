@@ -3,8 +3,13 @@ require 'spec_helper'
 Temping.create :trick do
   with_columns do |t|
     t.string :name
+    t.text :prerequisites
+    t.text :instructions
     t.boolean :frisbee
   end
+
+  serialize :prerequisites, JSON
+  serialize :instructions
 end
 
 Temping.create :level do
@@ -12,10 +17,13 @@ Temping.create :level do
     t.integer :score
     t.integer :dog_id
     t.integer :trick_id
+    t.text :rubric
     t.datetime :created_at
   end
 
   belongs_to :trick
+
+  serialize :rubric
 end
 
 
@@ -29,7 +37,8 @@ describe LiveFixtures::Export do
       set_export_dir DIR
 
       export_fixtures(levels, :trick) do |level|
-        { 'hash' => level.hash }
+        { 'hash' => level.hash,
+          'rubric' => level.rubric.to_yaml }
       end
 
       export_fixtures(levels.map(&:trick))
@@ -58,10 +67,14 @@ describe LiveFixtures::Export do
       [
         (Trick.create do |t|
            t.name = "Trick 1"
+           t.prerequisites = {}
+           t.instructions = ["Sit", "Shake", "Sit"]
            t.frisbee = false
          end),
         (Trick.create do |t|
            t.name = "Trick 2"
+           t.prerequisites = {trick: "Trick 1"}
+           t.instructions = []
            t.frisbee = true
          end),
       ]
@@ -72,12 +85,14 @@ describe LiveFixtures::Export do
           m.score = 100
           m.dog_id = 7
           m.trick_id = tricks.first.id
+          m.rubric = {pizzaz: 2, shininess:4}
           m.created_at = Time.now
         end),
         (Level.create do |m|
           m.score = 0
           m.dog_id = 8
           m.trick_id = tricks.last.id
+          m.rubric = {}
           m.created_at = Time.now
         end),
       ]
@@ -101,6 +116,8 @@ levels_#{level.id}:
   score: #{level.score}
   dog_id: #{level.dog_id}
   trick: tricks_#{level.trick_id}
+  rubric: |-
+#{level.rubric.to_yaml.indent(4)}
   created_at: #{level.created_at.utc.to_s(:db)}
   hash: #{level.hash}
 
@@ -115,6 +132,10 @@ levels_#{level.id}:
         <<-YML
 tricks_#{trick.id}:
   name: "#{trick.name}"
+  prerequisites: |-
+#{trick.prerequisites.to_json.indent(4)}
+  instructions: |-
+#{trick.instructions.to_yaml.indent(4)}
   frisbee: #{trick.frisbee}
 
         YML

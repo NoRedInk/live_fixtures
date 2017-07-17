@@ -1,6 +1,14 @@
 cafes_201300:
   name: "Elm Street Cafe"
   pass_code: <%= unique_pass_code %>
+  menu: |-
+    {"bone":2,"treat":3,"water":0}
+
+  chefs: |-
+    ---
+      - "Emilio"
+      - "Gretchen"
+
   dog: dogs_2540939
   created_at: 2015-07-27 21:47:50
   license_id: 3

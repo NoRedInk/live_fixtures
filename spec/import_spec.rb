@@ -32,6 +32,9 @@ describe LiveFixtures::Import do
     cafe = owner.cafes.first
     expect( cafe.name ).to eq "Elm Street Cafe"
 
+    expect( cafe.menu ).to eq({"bone"=>2, "treat"=>3, "water"=>0})
+    expect( cafe.chefs ).to eq(%w(Emilio Gretchen))
+
     visitors = cafe.visitors.all - [owner]
     expect( visitors.map(&:name) ).
         to contain_exactly("jgiraffe1", "kchameleon1")

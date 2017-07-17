@@ -40,6 +40,8 @@ Temping.create :cafe do
   with_columns do |t|
     t.string :name
     t.string :pass_code
+    t.text :menu
+    t.text :chefs
     t.integer :dog_id
     t.datetime :created_at
     t.integer :license_id
@@ -49,6 +51,9 @@ Temping.create :cafe do
   has_many :dog_cafes
   has_many :visitors, through: :dog_cafes, source: :dog, class_name: 'Dog'
   has_many :tables
+
+  serialize :menu, JSON
+  serialize :chefs
 end
 
 Temping.create :dog_cafe do
