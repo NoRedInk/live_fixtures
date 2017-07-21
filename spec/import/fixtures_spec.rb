@@ -36,8 +36,16 @@ describe LiveFixtures::Import::Fixtures do
         allow(ar_fixtureset_double).to receive(:table_name) { table_name }
       end
       let(:label_to_fetch) { 'not_the_right_label' }
+      let(:expected_message) {
+        <<-ERROR.squish
+        Unable to find ID for model referenced by label not_the_right_label while
+        importing Trogolodyte from trogolodytes.yml. Perhaps it isn't included
+        in these fixtures or it is too late in the insert_order and has not yet
+        been imported.
+        ERROR
+      }
       it 'raises a MissingReferenceError' do
-        expect { fetch_id_for_label }.to raise_error LiveFixtures::MissingReferenceError
+        expect { fetch_id_for_label }.to raise_error LiveFixtures::MissingReferenceError, expected_message
       end
     end
   end
