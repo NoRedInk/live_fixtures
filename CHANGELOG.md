@@ -3,10 +3,11 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [0.2.1] - 2017-??-??
-### Fixed
+### Breaking changes
  - For models with serialized attributes (for storing a ruby object or json blob in a single column, for example), live_fixtures will now use the coder specified in the model definition to dump the value to a string, rather than serializing it to yaml. #10, #11
 
 ### Added
+- There is now an option to prevent the importer from raising an ArgumentError when a yml file for a table listed in `insert_order` cannot be found. Additionally there is an option to enable raising an error if we attempt to replace a label with an ID and cannot find the label yet. This should allow more versatile insert_order lists.
  - Enhanced documentation #1, #12
 
 ## [0.2.0] - 2017-05-09
