@@ -118,6 +118,7 @@ class LiveFixtures::Import
       fk_name = (association.options[:foreign_key] || "#{association.name}_id").to_s
 
       # Do not replace association name with association foreign key if they are named the same
+      # TODO...this is kind of buggy, as this early return skips the label replacement.
       return if association.name.to_s == fk_name
 
       value = row.delete(association.name.to_s)
