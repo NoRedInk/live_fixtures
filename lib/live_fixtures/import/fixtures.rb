@@ -1,6 +1,9 @@
 require 'active_record/fixtures'
 
 class LiveFixtures::Import
+  # A labeled reference was not found.
+  # Maybe the referenced model was not exported, or the insert order attempted
+  # to import the reference before the referenced model?
   LiveFixtures::MissingReferenceError = Class.new(KeyError)
   class Fixtures
     delegate :model_class, :table_name, :fixtures, to: :ar_fixtures
