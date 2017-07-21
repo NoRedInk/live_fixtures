@@ -71,7 +71,7 @@ class LiveFixtures::Import
             # dogs: 12, 32, 144 instead of dogs: dogs_12, dogs_32, dogs_144
             # I'm not sure why we decided to do this.
             assoc_fk = if is_label_for_table?(target, association.table_name)
-              @label_to_id[target]
+              fetch_id_for_label(target)
             else
               target
             end

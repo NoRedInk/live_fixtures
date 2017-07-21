@@ -78,6 +78,9 @@ describe LiveFixtures::Import::Fixtures do
   end
 
   describe '#each_table_row_with_label' do
+    before do
+      label_to_id.merge!(already_imported_labels)
+    end
     subject(:yields) do
       [].tap do |yields|
         fixtures.each_table_row_with_label do |table_name, label, row|
@@ -87,6 +90,7 @@ describe LiveFixtures::Import::Fixtures do
         end
       end
     end
+    let(:already_imported_labels) { {} }
     let(:owner_label) { 'dogs_2540939' }
     let(:visitor_one_label) { 'dogs_2540954' }
     let(:visitor_two_label) { 'dogs_2540956' }
@@ -118,7 +122,6 @@ describe LiveFixtures::Import::Fixtures do
     context "which have a has_and_belongs_to_many association of ids" do
       let(:table_name) { 'dogs' }
       let(:class_name) { 'Dog' }
-      let(:label_to_id) { {} }
       let(:join_table_name) { 'dogs_flavors' }
       let(:owner_join_table_rows) do
         yields.select do |table_name, _, row|
@@ -141,9 +144,8 @@ describe LiveFixtures::Import::Fixtures do
     context "which have a has_and_belongs_to_many association of labels" do
       let(:table_name) { "tables" }
       let(:class_name) { 'Table' }
-      let(:label_to_id) do
+      let(:already_imported_labels) do
         {
-            table_label => 1941,
             visitor_one_label => 1942,
             visitor_two_label => 1962,
             cafe_label => 2016
@@ -171,9 +173,10 @@ describe LiveFixtures::Import::Fixtures do
     context "which reference another fixture using a label" do
       let(:table_name) { "tables" }
       let(:class_name) { 'Table' }
-      let(:label_to_id) do
+      let(:already_imported_labels) do
         {
-            table_label => 1941,
+            visitor_one_label => 1942,
+            visitor_two_label => 1962,
             cafe_label => 2016
         }
       end
@@ -189,10 +192,11 @@ describe LiveFixtures::Import::Fixtures do
     context "which use STI and this subclass has an association the other classes don't" do
       let(:table_name) { "tables" }
       let(:class_name) { 'Table' }
-      let(:label_to_id) do
+      let(:already_imported_labels) do
         {
-            table_label => 1941,
-            cafe_label => 2016
+          visitor_one_label => 1942,
+          visitor_two_label => 1962,
+          cafe_label => 2016
         }
       end
       let(:low_table) { yields.find {|_, label, _| label == low_table_label} }
