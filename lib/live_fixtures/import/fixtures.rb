@@ -101,6 +101,17 @@ class LiveFixtures::Import
       ERROR
     end
 
+    # Checks if the string looks like a label referencing the specified table.
+    # @param label_to_check [String] the string that might be a label.
+    # @param table_name [String] the table the label might reference.
+    # @return [Boolean] whether the string is a label for the table.
+    # @see LiveFixtures::Export::Reference
+    # @see LiveFixtures::Export::Fixture#yml_value
+    def is_label_for_table?(label_to_check, table_name)
+      label_prefix = table_name + "_"
+      label_to_check.starts_with? label_prefix
+    end
+
     def inheritance_column_name
       @inheritance_column_name ||= model_class && model_class.inheritance_column
     end
