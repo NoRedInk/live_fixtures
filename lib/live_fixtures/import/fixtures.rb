@@ -83,10 +83,18 @@ class LiveFixtures::Import
 
     # Uses the underlying map of labels to return the referenced model's newly
     # assigned ID.
+    # @raise [LiveFixtures::MissingReferenceError] if the label isn't found.
     # @param label_to_fetch [String] the label of the referenced model.
     # @return [Integer] the newly assigned ID of the referenced model.
     def fetch_id_for_label(label_to_fetch)
-      @label_to_id[label_to_fetch]
+      @label_to_id.fetch(label_to_fetch)
+    rescue KeyError
+      raise LiveFixtures::MissingReferenceError, <<-ERROR.squish
+      Unable to find ID for model referenced by label #{label_to_fetch} while
+      importing #{model_class} from #{table_name}.yml. Perhaps it isn't included
+      in these fixtures or it is too late in the insert_order and has not yet
+      been imported.
+      ERROR
     end
 
     def inheritance_column_name

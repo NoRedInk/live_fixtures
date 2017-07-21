@@ -15,10 +15,11 @@ describe LiveFixtures::Import::Fixtures do
       allow(ActiveRecord::FixtureSet).
         to receive(:new).
         with(any_args).
-        and_return(instance_double 'ActiveRecord::FixtureSet')
+        and_return(ar_fixtureset_double)
     end
-    let(:table_name) { nil }
-    let(:class_name) { nil }
+    let(:ar_fixtureset_double) { instance_double 'ActiveRecord::FixtureSet' }
+    let(:table_name) { 'trogolodytes' }
+    let(:class_name) { 'Trogolodyte' }
     subject(:fetch_id_for_label) { fixtures.send(:fetch_id_for_label, label_to_fetch) }
     let(:label_to_id) { { 'label' => 42 } }
 
@@ -30,6 +31,10 @@ describe LiveFixtures::Import::Fixtures do
     end
 
     context 'when the label is NOT in label_to_id' do
+      before do
+        allow(ar_fixtureset_double).to receive(:model_class) { class_name }
+        allow(ar_fixtureset_double).to receive(:table_name) { table_name }
+      end
       let(:label_to_fetch) { 'not_the_right_label' }
       it 'raises a MissingReferenceError' do
         expect { fetch_id_for_label }.to raise_error LiveFixtures::MissingReferenceError
