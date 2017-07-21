@@ -50,6 +50,33 @@ describe LiveFixtures::Import::Fixtures do
     end
   end
 
+  describe '#is_label_for_table?(label_to_check, table_name)' do
+    before do
+      allow(ActiveRecord::FixtureSet).
+        to receive(:new).
+        with(any_args).
+        and_return(ar_fixtureset_double)
+    end
+    let(:ar_fixtureset_double) { instance_double 'ActiveRecord::FixtureSet' }
+    let(:table_name) { 'trogolodytes' }
+    let(:class_name) { 'Trogolodyte' }
+    subject(:is_label_for_table) { fixtures.send(:is_label_for_table?, label_to_check, table_name) }
+
+    context 'when it IS a label' do
+      let(:label_to_check) { 'trogolodytes_42' }
+      it 'is true' do
+        expect(is_label_for_table).to be true
+      end
+    end
+
+    context 'when it is NOT a label' do
+      let(:label_to_check) { '42' }
+      it 'is false' do
+        expect(is_label_for_table).to be false
+      end
+    end
+  end
+
   describe '#each_table_row_with_label' do
     subject(:yields) do
       [].tap do |yields|
