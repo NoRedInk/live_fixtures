@@ -21,13 +21,20 @@ describe LiveFixtures::Import::Fixtures do
     let(:class_name) { nil }
     subject(:fetch_id_for_label) { fixtures.send(:fetch_id_for_label, label_to_fetch) }
     let(:label_to_id) { { 'label' => 42 } }
-    context 'when the label is in label_to_id' do
+
+    context 'when the label IS in label_to_id' do
       let(:label_to_fetch) { 'label' }
       it 'returns the corresponding id' do
         expect(fetch_id_for_label).to be 42
       end
     end
 
+    context 'when the label is NOT in label_to_id' do
+      let(:label_to_fetch) { 'not_the_right_label' }
+      it 'raises a MissingReferenceError' do
+        expect { fetch_id_for_label }.to raise_error LiveFixtures::MissingReferenceError
+      end
+    end
   end
 
   describe '#each_table_row_with_label' do
