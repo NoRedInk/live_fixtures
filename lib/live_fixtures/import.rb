@@ -6,7 +6,6 @@ class LiveFixtures::Import
   # the order in which to import them. The order should ensure fixtures
   # containing references to another fixture are imported AFTER the referenced
   # fixture.
-  # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
   # @return [LiveFixtures::Import] an importer
