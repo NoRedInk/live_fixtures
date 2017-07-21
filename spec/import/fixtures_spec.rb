@@ -10,6 +10,26 @@ describe LiveFixtures::Import::Fixtures do
   let(:label_to_id) { {} }
   let(:filepath) { File.join(File.dirname(__FILE__), "../data/live_fixtures/dog_cafes/#{table_name}") }
 
+  describe '#fetch_id_for_label' do
+    before do
+      allow(ActiveRecord::FixtureSet).
+        to receive(:new).
+        with(any_args).
+        and_return(instance_double 'ActiveRecord::FixtureSet')
+    end
+    let(:table_name) { nil }
+    let(:class_name) { nil }
+    subject(:fetch_id_for_label) { fixtures.send(:fetch_id_for_label, label_to_fetch) }
+    let(:label_to_id) { { 'label' => 42 } }
+    context 'when the label is in label_to_id' do
+      let(:label_to_fetch) { 'label' }
+      it 'returns the corresponding id' do
+        expect(fetch_id_for_label).to be 42
+      end
+    end
+
+  end
+
   describe '#each_table_row_with_label' do
     subject(:yields) do
       [].tap do |yields|
