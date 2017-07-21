@@ -66,7 +66,10 @@ class LiveFixtures::Import
       join_table_rows.each do |table_name, rows|
         rows.each do |targets:, association:, label:|
           targets.each do |target|
-            assoc_fk = if target.starts_with?(association.table_name)
+            # This song and dance is so we can specify HABTM like so:
+            # dogs: 12, 32, 144 instead of dogs: dogs_12, dogs_32, dogs_144
+            # I'm not sure why we decided to do this.
+            assoc_fk = if is_label_for_table?(target, association.table_name)
               @label_to_id[target]
             else
               target
