@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "temping", "~> 3.0"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-nav"
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "reek"
