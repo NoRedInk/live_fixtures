@@ -18,7 +18,7 @@ class LiveFixtures::Import
     end
     @table_names = insert_order.select {|table_name| @table_names.include? table_name}
     if @table_names.size < insert_order.size
-      raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
+      warn "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
     end
     @label_to_id = {}
   end
