@@ -14,6 +14,17 @@ describe LiveFixtures::Import do
     )
   end
 
+  describe '#initialize' do
+    context 'when insert_order includes a non-existent file' do
+      let(:insert_order) { %w{dogs cafes dog_cafes tables trogolodytes} }
+      let(:root_path) { File.join(File.dirname(__FILE__), "data", "live_fixtures", "dog_cafes") }
+      subject(:import) { LiveFixtures::Import.new root_path, insert_order }
+      it 'raises an ArgumentError' do
+        expect { import }.to raise_error ArgumentError
+      end
+    end
+  end
+
   it "creates records in the db as expected" do
     root_path = File.join File.dirname(__FILE__),
                           "data/live_fixtures/dog_cafes/"
