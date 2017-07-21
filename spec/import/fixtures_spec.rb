@@ -106,7 +106,8 @@ describe LiveFixtures::Import::Fixtures do
         {
             table_label => 1941,
             visitor_one_label => 1942,
-            visitor_two_label => 1982
+            visitor_two_label => 1982,
+            cafe_label => 2016
         }
       end
       let(:join_table_name) { 'dogs_tables' }

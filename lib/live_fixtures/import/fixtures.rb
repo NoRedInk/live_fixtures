@@ -123,7 +123,7 @@ class LiveFixtures::Import
         row[association.foreign_type] = $1
       end
 
-      row[fk_name] = @label_to_id[value]
+      row[fk_name] = fetch_id_for_label(value)
     end
 
     private :ar_fixtures
