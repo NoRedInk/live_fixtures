@@ -74,7 +74,8 @@ class LiveFixtures::Import
             else
               target
             end
-            row = { association.foreign_key             => @label_to_id[label],
+            binding.pry
+            row = { association.foreign_key             => fetch_id_for_label(label),
                     association.association_foreign_key => assoc_fk }
             yield [table_name, NO_LABEL, row]
           end
