@@ -1,6 +1,7 @@
 require 'active_record/fixtures'
 
 class LiveFixtures::Import
+  LiveFixtures::MissingReferenceError = Class.new(KeyError)
   class Fixtures
     delegate :model_class, :table_name, :fixtures, to: :ar_fixtures
     # ActiveRecord::FixtureSet for delegation
