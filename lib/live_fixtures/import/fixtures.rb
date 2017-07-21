@@ -77,6 +77,14 @@ class LiveFixtures::Import
 
     private
 
+    # Uses the underlying map of labels to return the referenced model's newly
+    # assigned ID.
+    # @param label_to_fetch [String] the label of the referenced model.
+    # @return [Integer] the newly assigned ID of the referenced model.
+    def fetch_id_for_label(label_to_fetch)
+      @label_to_id[label_to_fetch]
+    end
+
     def inheritance_column_name
       @inheritance_column_name ||= model_class && model_class.inheritance_column
     end
