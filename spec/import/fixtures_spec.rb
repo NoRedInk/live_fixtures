@@ -93,6 +93,9 @@ describe LiveFixtures::Import::Fixtures do
     let(:cafe_label) { 'cafes_201300' }
 
     context "which use ERB" do
+      before do
+        allow(fixtures).to receive(:fetch_id_for_label) { 42 }
+      end
       let(:table_name) { "dogs" }
       let(:class_name) { Dog }
       let(:owner) { yields.find {|_, label, _| label == owner_label} }
