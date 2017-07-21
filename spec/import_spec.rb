@@ -1,15 +1,17 @@
 require 'spec_helper'
 
 describe LiveFixtures::Import do
-  before do
-    allow(ProgressBar).to receive(:create).and_return(
-        double(ProgressBar, increment:nil, finished?: nil, finish: nil)
-    )
+  before(:all) do
     [2077, 2327, 2321, 1744].each do |id|
       Flavor.create do |rt|
         rt.id = id
       end
     end
+  end
+  before do
+    allow(ProgressBar).to receive(:create).and_return(
+        double(ProgressBar, increment:nil, finished?: nil, finish: nil)
+    )
   end
 
   it "creates records in the db as expected" do
