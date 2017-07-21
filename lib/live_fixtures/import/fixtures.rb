@@ -1,3 +1,4 @@
+require 'pry'
 require 'active_record/fixtures'
 
 class LiveFixtures::Import

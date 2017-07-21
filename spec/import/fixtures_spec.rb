@@ -80,8 +80,10 @@ describe LiveFixtures::Import::Fixtures do
   describe '#each_table_row_with_label' do
     subject(:yields) do
       [].tap do |yields|
-        fixtures.each_table_row_with_label do |value|
-          yields << value
+        fixtures.each_table_row_with_label do |table_name, label, row|
+          new_id = fake_db[label]
+          label_to_id[label] = new_id
+          yields << [table_name, label, row]
         end
       end
     end
@@ -91,11 +93,18 @@ describe LiveFixtures::Import::Fixtures do
     let(:table_label) { 'tables_977909' }
     let(:low_table_label) { 'tables_978319' }
     let(:cafe_label) { 'cafes_201300' }
+    let(:fake_db) {
+      {
+        owner_label => 1982,
+        visitor_one_label => 1942,
+        visitor_two_label => 1962,
+        table_label => 1941,
+        low_table_label => 1940,
+        cafe_label => 2016,
+      }
+    }
 
     context "which use ERB" do
-      before do
-        allow(fixtures).to receive(:fetch_id_for_label) { 42 }
-      end
       let(:table_name) { "dogs" }
       let(:class_name) { Dog }
       let(:owner) { yields.find {|_, label, _| label == owner_label} }
@@ -109,7 +118,7 @@ describe LiveFixtures::Import::Fixtures do
     context "which have a has_and_belongs_to_many association of ids" do
       let(:table_name) { 'dogs' }
       let(:class_name) { 'Dog' }
-      let(:label_to_id) { {owner_label => 1982} }
+      let(:label_to_id) { {} }
       let(:join_table_name) { 'dogs_flavors' }
       let(:owner_join_table_rows) do
         yields.select do |table_name, _, row|
@@ -136,7 +145,7 @@ describe LiveFixtures::Import::Fixtures do
         {
             table_label => 1941,
             visitor_one_label => 1942,
-            visitor_two_label => 1982,
+            visitor_two_label => 1962,
             cafe_label => 2016
         }
       end
@@ -155,7 +164,7 @@ describe LiveFixtures::Import::Fixtures do
         end
 
         habtm_ids = join_table_rows.map { |_, _, row| row['dog_id'].to_i}
-        expect(habtm_ids).to contain_exactly(1942, 1982)
+        expect(habtm_ids).to contain_exactly(1942, 1962)
       end
     end
 
