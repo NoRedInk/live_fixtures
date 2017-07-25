@@ -157,7 +157,21 @@ If we pass `:user` as references, LiveFixtures will replace the foreign key with
 
 When we import these fixtures using the correct `insert_order` (`['users', 'posts']`), the newly imported post will belong to the newly imported user, no matter what their new ids are.
 
-Currently, this only works for associations that return a single record (:belongs_to and :has_one).
+Currently, this works for `belongs_to` and `has_and_belongs_to_many` associations.
+
+For `has_and_belongs_to_many` associations, there is a good deal of flexibility. The attribute name should be the name of the association (probably plural). The attribute value should be a list of the associated records. This list can be either an array or a comma separated list. If the list is a list of labels, the labels will be replaced on import. If it is a list of IDs, the IDs will be inserted as they are listed.
+
+
+    # In dogwalkers.yml
+    dogwalkers_15:
+      dogs: '1,3'
+
+    dogwalkers_16:
+      dogs:
+        - dogs_12
+        - dogs_14
+
+The above fixture, when imported would add both Dogwalker fixtures to the `dogwalkers` table, and it would also populate the join table (`dogwalkers_dogs`, or whatever is specified by the association). All the labels will be replaced with their newly assigned IDs, but the IDs of dogwalkers_15's dogs will remain as 1 and 3.
 
 ### Templates
 

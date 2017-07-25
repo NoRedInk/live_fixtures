@@ -1,6 +1,11 @@
+require 'pry'
 require 'active_record/fixtures'
 
 class LiveFixtures::Import
+  # A labeled reference was not found.
+  # Maybe the referenced model was not exported, or the insert order attempted
+  # to import the reference before the referenced model?
+  LiveFixtures::MissingReferenceError = Class.new(KeyError)
   class Fixtures
     delegate :model_class, :table_name, :fixtures, to: :ar_fixtures
     # ActiveRecord::FixtureSet for delegation
@@ -62,8 +67,15 @@ class LiveFixtures::Import
       join_table_rows.each do |table_name, rows|
         rows.each do |targets:, association:, label:|
           targets.each do |target|
-            assoc_fk = @label_to_id[target] || target
-            row = { association.foreign_key             => @label_to_id[label],
+            # This song and dance is so we can specify HABTM like so:
+            # dogs: 12, 32, 144 instead of dogs: dogs_12, dogs_32, dogs_144
+            # I'm not sure why we decided to do this.
+            assoc_fk = if is_label_for_table?(target, association.table_name)
+              fetch_id_for_label(target)
+            else
+              target
+            end
+            row = { association.foreign_key             => fetch_id_for_label(label),
                     association.association_foreign_key => assoc_fk }
             yield [table_name, NO_LABEL, row]
           end
@@ -76,6 +88,33 @@ class LiveFixtures::Import
     end
 
     private
+
+    # Uses the underlying map of labels to return the referenced model's newly
+    # assigned ID.
+    # @raise [LiveFixtures::MissingReferenceError] if the label isn't found.
+    # @param label_to_fetch [String] the label of the referenced model.
+    # @return [Integer] the newly assigned ID of the referenced model.
+    def fetch_id_for_label(label_to_fetch)
+      @label_to_id.fetch(label_to_fetch)
+    rescue KeyError
+      raise LiveFixtures::MissingReferenceError, <<-ERROR.squish
+      Unable to find ID for model referenced by label #{label_to_fetch} while
+      importing #{model_class} from #{table_name}.yml. Perhaps it isn't included
+      in these fixtures or it is too late in the insert_order and has not yet
+      been imported.
+      ERROR
+    end
+
+    # Checks if the string looks like a label referencing the specified table.
+    # @param label_to_check [String] the string that might be a label.
+    # @param table_name [String] the table the label might reference.
+    # @return [Boolean] whether the string is a label for the table.
+    # @see LiveFixtures::Export::Reference
+    # @see LiveFixtures::Export::Fixture#yml_value
+    def is_label_for_table?(label_to_check, table_name)
+      label_prefix = table_name + "_"
+      label_to_check.starts_with? label_prefix
+    end
 
     def inheritance_column_name
       @inheritance_column_name ||= model_class && model_class.inheritance_column
@@ -94,6 +133,7 @@ class LiveFixtures::Import
       fk_name = (association.options[:foreign_key] || "#{association.name}_id").to_s
 
       # Do not replace association name with association foreign key if they are named the same
+      # TODO...this is kind of buggy, as this early return skips the label replacement.
       return if association.name.to_s == fk_name
 
       value = row.delete(association.name.to_s)
@@ -103,7 +143,7 @@ class LiveFixtures::Import
         row[association.foreign_type] = $1
       end
 
-      row[fk_name] = @label_to_id[value]
+      row[fk_name] = fetch_id_for_label(value)
     end
 
     private :ar_fixtures

@@ -1,13 +1,27 @@
 require 'spec_helper'
 
 describe LiveFixtures::Import do
+  before(:all) do
+    [2077, 2327, 2321, 1744].each do |id|
+      Flavor.create do |rt|
+        rt.id = id
+      end
+    end
+  end
   before do
     allow(ProgressBar).to receive(:create).and_return(
         double(ProgressBar, increment:nil, finished?: nil, finish: nil)
     )
-    [2077, 2327, 2321, 1744].each do |id|
-      Flavor.create do |rt|
-        rt.id = id
+  end
+
+  describe '#initialize' do
+    context 'when insert_order includes a non-existent file' do
+      let(:insert_order) { %w{dogs cafes dog_cafes tables trogolodytes} }
+      let(:root_path) { File.join(File.dirname(__FILE__), "data", "live_fixtures", "dog_cafes") }
+      subject(:import) { LiveFixtures::Import.new root_path, insert_order }
+      it 'ingores it' do
+        expect(import).to be_a LiveFixtures::Import
+        expect(import.instance_variable_get('@table_names')).not_to include 'trogolodytes'
       end
     end
   end
