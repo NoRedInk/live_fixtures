@@ -10,46 +10,6 @@ describe LiveFixtures::Import::Fixtures do
   let(:label_to_id) { {} }
   let(:filepath) { File.join(File.dirname(__FILE__), "../data/live_fixtures/dog_cafes/#{table_name}") }
 
-  describe '#fetch_id_for_label' do
-    before do
-      allow(ActiveRecord::FixtureSet).
-        to receive(:new).
-        with(any_args).
-        and_return(ar_fixtureset_double)
-    end
-    let(:ar_fixtureset_double) { instance_double 'ActiveRecord::FixtureSet' }
-    let(:table_name) { 'trogolodytes' }
-    let(:class_name) { 'Trogolodyte' }
-    subject(:fetch_id_for_label) { fixtures.send(:fetch_id_for_label, label_to_fetch) }
-    let(:label_to_id) { { 'label' => 42 } }
-
-    context 'when the label IS in label_to_id' do
-      let(:label_to_fetch) { 'label' }
-      it 'returns the corresponding id' do
-        expect(fetch_id_for_label).to be 42
-      end
-    end
-
-    context 'when the label is NOT in label_to_id' do
-      before do
-        allow(ar_fixtureset_double).to receive(:model_class) { class_name }
-        allow(ar_fixtureset_double).to receive(:table_name) { table_name }
-      end
-      let(:label_to_fetch) { 'not_the_right_label' }
-      let(:expected_message) {
-        <<-ERROR.squish
-        Unable to find ID for model referenced by label not_the_right_label while
-        importing Trogolodyte from trogolodytes.yml. Perhaps it isn't included
-        in these fixtures or it is too late in the insert_order and has not yet
-        been imported.
-        ERROR
-      }
-      it 'raises a MissingReferenceError' do
-        expect { fetch_id_for_label }.to raise_error LiveFixtures::MissingReferenceError, expected_message
-      end
-    end
-  end
-
   describe '#each_table_row_with_label' do
     subject(:yields) do
       [].tap do |yields|
