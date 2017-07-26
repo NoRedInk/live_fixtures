@@ -9,15 +9,16 @@ class LiveFixtures::Import
   # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
+  # @param :skip_missing_tables [Boolean] whether to raise an ArgumentError if there isn't a yml file for each table in insert_order.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
-  def initialize(root_path, insert_order)
+  def initialize(root_path, insert_order, skip_missing_tables: false)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
     end
     @table_names = insert_order.select {|table_name| @table_names.include? table_name}
-    if @table_names.size < insert_order.size
+    if @table_names.size < insert_order.size && !skip_missing_tables
       raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
     end
     @label_to_id = {}
