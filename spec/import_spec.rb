@@ -22,6 +22,15 @@ describe LiveFixtures::Import do
       it 'raises an ArgumentError' do
         expect { import }.to raise_error ArgumentError
       end
+      context 'and :skip_missing_tables is true' do
+        subject(:import) {
+          LiveFixtures::Import.new root_path, insert_order, skip_missing_tables: true
+        }
+        it 'skips missing tables.' do
+          expect(import.instance_variable_get('@table_names')).
+            to match_array(insert_order - %w{trogolodytes})
+        end
+      end
     end
   end
 
