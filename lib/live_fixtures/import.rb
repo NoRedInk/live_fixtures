@@ -11,10 +11,11 @@ class LiveFixtures::Import
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
   # @param [Hash] options the import options
   # @option options [Boolean] :skip_missing_tables whether to raise an ArgumentError if there isn't a yml file for each table in insert_order.
+  # @option options [Boolean] :skip_missing_references whether to raise an error if an ID for a labeled reference cannot be found.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order, **options)
-    @options = {skip_missing_tables: false}.merge(options)
+    @options = {skip_missing_tables: false, skip_missing_references: true}.merge(options)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
@@ -55,7 +56,8 @@ class LiveFixtures::Import
                             table_name,
                             class_name,
                             ::File.join(@root_path, path),
-                            @label_to_id)
+                            @label_to_id,
+                            skip_missing_references: @options[:skip_missing_references])
 
           conn = ff.model_connection || connection
           ProgressBarIterator.new(ff).each do |table_name, label, row|

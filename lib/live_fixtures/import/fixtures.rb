@@ -15,7 +15,9 @@ class LiveFixtures::Import
     # @param class_name [Constant] the model's class name
     # @param filepath [String] path to the yml file containing the fixtures
     # @param label_to_id [Hash{String => Int}] map from a reference's label to its new id.
-    def initialize(connection, table_name, class_name, filepath, label_to_id)
+    # @param :skip_missing_references [Boolean] whether to raise an error if an ID for a labeled reference cannot be found.
+    def initialize(connection, table_name, class_name, filepath, label_to_id, skip_missing_references: true)
+      @skip_missing_references = skip_missing_references
       @ar_fixtures = ActiveRecord::FixtureSet.new connection,
         table_name,
         class_name,
@@ -89,6 +91,8 @@ class LiveFixtures::Import
     def fetch_id_for_label(label_to_fetch)
       @label_to_id.fetch(label_to_fetch)
     rescue KeyError
+      return if @skip_missing_references
+
       raise LiveFixtures::MissingReferenceError, <<-ERROR.squish
       Unable to find ID for model referenced by label #{label_to_fetch} while
       importing #{model_class} from #{table_name}.yml. Perhaps it isn't included
