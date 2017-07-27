@@ -25,6 +25,7 @@ class LiveFixtures::Import
 
   # Within a transaction, import all the fixtures into the database.
   # @param class_names [Hash{Symbol => String}] a mapping table name => Model class, for any that don't follow convention.
+  # @param show_progress [Boolean] pass false to disable the progress bar.
   #
   # The very similar method: ActiveRecord::FixtureSet.create_fixtures has the
   # unfortunate side effect of truncating each table!!
@@ -33,7 +34,7 @@ class LiveFixtures::Import
   # with calling {LiveFixtures::Import::Fixtures#each_table_row_with_label} instead of
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
-  def import_all(class_names = {})
+  def import_all(class_names = {}, show_progress: true)
     @table_names.each { |n|
       class_names[n.tr('/', '_').to_sym] ||= n.classify if n.include?('/')
     }
@@ -55,7 +56,9 @@ class LiveFixtures::Import
                             @label_to_id)
 
           conn = ff.model_connection || connection
-          ProgressBarIterator.new(ff).each do |table_name, label, row|
+
+          iterator = show_progress ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |table_name, label, row|
             conn.insert_fixture(row, table_name)
             @label_to_id[label] = conn.last_inserted_id(table_name) unless label == NO_LABEL
           end
@@ -79,6 +82,19 @@ class LiveFixtures::Import
         @bar.increment unless @bar.finished?
       end
       @bar.finish
+    end
+  end
+
+  class SimpleIterator
+    def initialize(ff)
+      @ff = ff
+    end
+
+    def each
+      puts @ff.model_class.name
+      @ff.each_table_row_with_label do |*args|
+        yield(*args)
+      end
     end
   end
 end
