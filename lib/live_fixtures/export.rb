@@ -33,6 +33,7 @@ module LiveFixtures::Export
   # Export models to a yml file named after the corresponding table.
   # @param models [Enumerable] an Enumerable containing ActiveRecord models.
   # @param with_references [Array<Symbol>] the associations whose foreign_keys should be replaced with references.
+  # @param show_progress [Boolean] pass false to disable the progress bar.
   #
   # Takes an optional block that will be invoked for each model.
   # The block should return a hash of attributes to be merged and
@@ -40,13 +41,14 @@ module LiveFixtures::Export
   # @yield [model] an optional block that will be invoked for each model.
   # @yieldparam model [ActiveRecord::Base] each successive model.
   # @yieldreturn [Hash{String => Object}] a hash of attributes to be merged and saved with the model's attributes.
-  def export_fixtures(models, with_references = [])
+  def export_fixtures(models, with_references = [], show_progress: true)
     return unless models.present?
 
     table_name = models.first.class.table_name
     File.open(File.join(@dir, table_name + '.yml'), 'w') do |file|
 
-      ProgressBarIterator.new(models).each do |model|
+      iterator = show_progress ? ProgressBarIterator : SimpleIterator
+      iterator.new(models).each do |model|
         more_attributes = block_given? ? yield(model) : {}
         file.write Fixture.to_yaml(model, with_references, more_attributes)
       end
@@ -67,6 +69,19 @@ module LiveFixtures::Export
       @models.each do |model|
         yield model
         @bar.increment
+      end
+    end
+  end
+
+  class SimpleIterator
+    def initialize(models)
+      @models = models
+    end
+
+    def each
+      puts @models.first.class.name
+      @models.each do |model|
+        yield model
       end
     end
   end
