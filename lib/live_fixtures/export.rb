@@ -29,6 +29,12 @@ module LiveFixtures::Export
     FileUtils.mkdir_p(@dir) unless File.directory?(@dir)
   end
 
+  # Specify the options to use when exporting your fixtures.
+  # @param [Hash] opts export configuration options
+  def set_export_options(**opts)
+    @export_options = opts
+  end
+
   ##
   # Export models to a yml file named after the corresponding table.
   # @param models [Enumerable] an Enumerable containing ActiveRecord models.
