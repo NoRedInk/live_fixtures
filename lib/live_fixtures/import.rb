@@ -13,14 +13,14 @@ class LiveFixtures::Import
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order, **opts)
-    defaut_options = { show_progress: true }
+    defaut_options = { show_progress: true, skip_missing_tables: false }
     @options = defaut_options.merge(opts)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
     end
     @table_names = insert_order.select {|table_name| @table_names.include? table_name}
-    if @table_names.size < insert_order.size
+    if @table_names.size < insert_order.size && !@options[:skip_missing_tables]
       raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
     end
     @label_to_id = {}
