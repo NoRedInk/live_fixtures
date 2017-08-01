@@ -13,7 +13,8 @@ class LiveFixtures::Import
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order, **opts)
-    @options = opts
+    defaut_options = { show_progress: true }
+    @options = defaut_options.merge(opts)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
@@ -57,7 +58,8 @@ class LiveFixtures::Import
                             @label_to_id)
 
           conn = ff.model_connection || connection
-          ProgressBarIterator.new(ff).each do |table_name, label, row|
+          iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |table_name, label, row|
             conn.insert_fixture(row, table_name)
             @label_to_id[label] = conn.last_inserted_id(table_name) unless label == NO_LABEL
           end
@@ -81,6 +83,19 @@ class LiveFixtures::Import
         @bar.increment unless @bar.finished?
       end
       @bar.finish
+    end
+  end
+
+  class SimpleIterator
+    def initialize(ff)
+      @ff = ff
+    end
+
+    def each
+      puts @ff.model_class.name
+      @ff.each_table_row_with_label do |*args|
+        yield(*args)
+      end
     end
   end
 end
