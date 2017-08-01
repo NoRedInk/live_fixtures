@@ -32,7 +32,14 @@ module LiveFixtures::Export
   # Specify the options to use when exporting your fixtures.
   # @param [Hash] opts export configuration options
   def set_export_options(**opts)
-    @export_options = opts
+    defaults = { show_progress: true }
+    @export_options = defaults.merge(opts)
+  end
+
+  # The options to use when exporting your fixtures.
+  # @return [Hash] export configuration options
+  def export_options
+    @export_options ||= set_export_options
   end
 
   ##
@@ -52,7 +59,9 @@ module LiveFixtures::Export
     table_name = models.first.class.table_name
     File.open(File.join(@dir, table_name + '.yml'), 'w') do |file|
 
-      ProgressBarIterator.new(models).each do |model|
+      iterator = export_options[:show_progress] ? ProgressBarIterator : SimpleIterator
+
+      iterator.new(models).each do |model|
         more_attributes = block_given? ? yield(model) : {}
         file.write Fixture.to_yaml(model, with_references, more_attributes)
       end
@@ -73,6 +82,19 @@ module LiveFixtures::Export
       @models.each do |model|
         yield model
         @bar.increment
+      end
+    end
+  end
+
+  class SimpleIterator
+    def initialize(models)
+      @models = models
+    end
+
+    def each
+      puts @models.first.class.name
+      @models.each do |model|
+        yield model
       end
     end
   end
