@@ -31,6 +31,7 @@ module LiveFixtures::Export
 
   # Specify the options to use when exporting your fixtures.
   # @param [Hash] opts export configuration options
+  # @option opts [Boolean] show_progress whether or not to show the progress bar
   def set_export_options(**opts)
     defaults = { show_progress: true }
     @export_options = defaults.merge(opts)

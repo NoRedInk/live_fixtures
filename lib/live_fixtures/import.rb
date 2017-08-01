@@ -10,6 +10,9 @@ class LiveFixtures::Import
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
   # @param [Hash] opts export configuration options
+  # @option opts [Boolean] show_progress whether or not to show the progress bar
+  # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
+  # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order, **opts)
