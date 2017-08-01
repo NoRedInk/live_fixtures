@@ -9,9 +9,11 @@ class LiveFixtures::Import
   # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
+  # @param [Hash] opts export configuration options
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
-  def initialize(root_path, insert_order)
+  def initialize(root_path, insert_order, **opts)
+    @options = opts
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
