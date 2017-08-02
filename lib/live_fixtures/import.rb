@@ -9,15 +9,21 @@ class LiveFixtures::Import
   # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
+  # @param [Hash] opts export configuration options
+  # @option opts [Boolean] show_progress whether or not to show the progress bar
+  # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
+  # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
-  def initialize(root_path, insert_order)
+  def initialize(root_path, insert_order, **opts)
+    defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: true }
+    @options = defaut_options.merge(opts)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
     end
     @table_names = insert_order.select {|table_name| @table_names.include? table_name}
-    if @table_names.size < insert_order.size
+    if @table_names.size < insert_order.size && !@options[:skip_missing_tables]
       raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
     end
     @label_to_id = {}
@@ -52,10 +58,12 @@ class LiveFixtures::Import
                             table_name,
                             class_name,
                             ::File.join(@root_path, path),
-                            @label_to_id)
+                            @label_to_id,
+                            skip_missing_refs: @options[:skip_missing_refs])
 
           conn = ff.model_connection || connection
-          ProgressBarIterator.new(ff).each do |table_name, label, row|
+          iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |table_name, label, row|
             conn.insert_fixture(row, table_name)
             @label_to_id[label] = conn.last_inserted_id(table_name) unless label == NO_LABEL
           end
@@ -79,6 +87,19 @@ class LiveFixtures::Import
         @bar.increment unless @bar.finished?
       end
       @bar.finish
+    end
+  end
+
+  class SimpleIterator
+    def initialize(ff)
+      @ff = ff
+    end
+
+    def each
+      puts @ff.model_class.name
+      @ff.each_table_row_with_label do |*args|
+        yield(*args)
+      end
     end
   end
 end

@@ -1,6 +1,11 @@
 require 'active_record/fixtures'
 
 class LiveFixtures::Import
+  # A labeled reference was not found.
+  # Maybe the referenced model was not exported, or the insert order attempted
+  # to import the reference before the referenced model?
+  LiveFixtures::MissingReferenceError = Class.new(KeyError)
+
   class Fixtures
     delegate :model_class, :table_name, :fixtures, to: :ar_fixtures
     # ActiveRecord::FixtureSet for delegation
@@ -11,7 +16,8 @@ class LiveFixtures::Import
     # @param class_name [Constant] the model's class name
     # @param filepath [String] path to the yml file containing the fixtures
     # @param label_to_id [Hash{String => Int}] map from a reference's label to its new id.
-    def initialize(connection, table_name, class_name, filepath, label_to_id)
+    def initialize(connection, table_name, class_name, filepath, label_to_id, skip_missing_refs: true)
+      @skip_missing_refs = skip_missing_refs
       @ar_fixtures = ActiveRecord::FixtureSet.new connection,
         table_name,
         class_name,
@@ -63,7 +69,7 @@ class LiveFixtures::Import
         rows.each do |targets:, association:, label:|
           targets.each do |target|
             assoc_fk = @label_to_id[target] || target
-            row = { association.foreign_key             => @label_to_id[label],
+            row = { association.foreign_key             => fetch_id_for_label(label),
                     association.association_foreign_key => assoc_fk }
             yield [table_name, NO_LABEL, row]
           end
@@ -103,7 +109,25 @@ class LiveFixtures::Import
         row[association.foreign_type] = $1
       end
 
-      row[fk_name] = @label_to_id[value]
+      row[fk_name] = fetch_id_for_label(value)
+    end
+
+    # Uses the underlying map of labels to return the referenced model's newly
+    # assigned ID.
+    # @raise [LiveFixtures::MissingReferenceError] if the label isn't found.
+    # @param label_to_fetch [String] the label of the referenced model.
+    # @return [Integer] the newly assigned ID of the referenced model.
+    def fetch_id_for_label(label_to_fetch)
+      @label_to_id.fetch(label_to_fetch)
+    rescue KeyError
+      return nil if @skip_missing_refs
+
+      raise LiveFixtures::MissingReferenceError, <<-ERROR.squish
+      Unable to find ID for model referenced by label #{label_to_fetch} while
+      importing #{model_class} from #{table_name}.yml. Perhaps it isn't included
+      in these fixtures or it is too late in the insert_order and has not yet
+      been imported.
+      ERROR
     end
 
     private :ar_fixtures
