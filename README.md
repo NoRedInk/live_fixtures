@@ -29,6 +29,10 @@ Or install it yourself as:
 
 ## Usage
 
+This gem provides functionality for both the export and the import of fixtures.
+
+While they work nicely together, it is also possible to import manually generated fixtures.
+
 ### Exporting
 
 The `LiveFixtures::Export` module is meant to be included into your export class.
@@ -62,7 +66,10 @@ The `LiveFixtures::Export` module is meant to be included into your export class
    one yml file for each db table. Do *not* call export_fixtures multiple
    times for the same db table - that will overwrite the file each time!
 
-3. For advanced usage, read the sections about Additional Attributes, References, and Templates.
+3. You can optionally call #set_export_options, passing {show_progress: false}
+   if you'd like to disable the progress bar.
+
+4. For advanced usage, read the sections about Additional Attributes, References, and Templates.
 
 ### Importing
 
@@ -78,9 +85,19 @@ The `LiveFixtures::Import` class allows you to specify the location of your fixt
       end
     end
 
+Options may be passed when initializing an importer as follow:
+ - show_progress: defaults to true.
+   Pass false to disable the progress bar output.
+ - skip_missing_tables: defaults to false.
+   Pass true to avoid raising an error when a table listed in insert_order has
+   no yml file.
+ - skip_missing_refs: defaults to true.
+   Pass false to raise an error when the importer is unable to re-establish a
+   relation.
+
 ## Advanced Usage
 
-The following topics work with the following schema and exporter:
+The following topics reference this schema and exporter:
 
     class User < ActiveRecord::Base
       has_many :posts
@@ -88,6 +105,11 @@ The following topics work with the following schema and exporter:
 
     class Post < ActiveRecord::Base
       belongs_to :user
+      has_and_belongs_to_many :channels
+    end
+
+    class Channel < ActiveRecord::Base
+      has_and_belongs_to_many :users
     end
 
     class YourExporter
@@ -157,7 +179,29 @@ If we pass `:user` as references, LiveFixtures will replace the foreign key with
 
 When we import these fixtures using the correct `insert_order` (`['users', 'posts']`), the newly imported post will belong to the newly imported user, no matter what their new ids are.
 
-Currently, this only works for associations that return a single record (:belongs_to and :has_one).
+Currently, this works for belongs_to and has_and_belongs_to_many associations.
+
+For has_and_belongs_to_many relation, add a field to one of the records, and the import will populate the join table.
+
+The formatting of the fixture is quite flexible, and the value for this field can be either a list or comma-separated string containing either references or IDs of the associated records. In all cases, though, the value should match the association name. Note that in all cases below the key is `channels` and not `channel_ids`:
+
+    # In our users.yml file
+    users_5678:
+      channels: "1,2,3"
+
+    users_1234:
+      channels:
+        - channel_1
+        - bobs_cool_channel
+
+    # In our channels.yml file
+    channel_1:
+      ...
+
+    bobs_cool_channel:
+      ...
+
+Also note it's not necessary to format your references the way the exporter does - `bobs_cool_channel` is a totally valid reference.
 
 ### Templates
 
