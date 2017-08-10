@@ -16,7 +16,7 @@ class LiveFixtures::Import
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order, **opts)
-    defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: true }
+    defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: false }
     @options = defaut_options.merge(opts)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|

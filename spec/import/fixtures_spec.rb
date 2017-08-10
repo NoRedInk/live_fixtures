@@ -5,7 +5,8 @@ describe LiveFixtures::Import::Fixtures do
                                                           table_name,
                                                           class_name,
                                                           filepath,
-                                                          label_to_id }
+                                                          label_to_id,
+                                                          skip_missing_refs: true }
   let(:connection) { ActiveRecord::Base.connection }
   let(:label_to_id) { {} }
   let(:filepath) { File.join(File.dirname(__FILE__), "../data/live_fixtures/dog_cafes/#{table_name}") }

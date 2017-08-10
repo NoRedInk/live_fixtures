@@ -16,7 +16,7 @@ class LiveFixtures::Import
     # @param class_name [Constant] the model's class name
     # @param filepath [String] path to the yml file containing the fixtures
     # @param label_to_id [Hash{String => Int}] map from a reference's label to its new id.
-    def initialize(connection, table_name, class_name, filepath, label_to_id, skip_missing_refs: true)
+    def initialize(connection, table_name, class_name, filepath, label_to_id, skip_missing_refs: false)
       @skip_missing_refs = skip_missing_refs
       @ar_fixtures = ActiveRecord::FixtureSet.new connection,
         table_name,

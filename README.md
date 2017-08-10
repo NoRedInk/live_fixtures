@@ -91,7 +91,7 @@ Options may be passed when initializing an importer as follow:
  - skip_missing_tables: defaults to false.
    Pass true to avoid raising an error when a table listed in insert_order has
    no yml file.
- - skip_missing_refs: defaults to true.
+ - skip_missing_refs: defaults to false.
    Pass false to raise an error when the importer is unable to re-establish a
    relation.
 
