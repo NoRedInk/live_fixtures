@@ -36,8 +36,7 @@ module LiveFixtures::Export::Fixture
   end
 
   private_class_method def yml_attributes(model, more_attributes)
-    model.attributes.merge(more_attributes).map do |name, value|
-      next if %w{id}.include? name
+    model.attributes.except("id").merge(more_attributes).map do |name, value|
       next if value.nil?
 
       serialize_attribute(model, name, value)
