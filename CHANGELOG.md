@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.3.1] - 2018-03-28
+### Breaking changes
+ - None
+
+### Fixed
+ - None
+
+### Added
+ - It is now possible to export an attribute named "id" when it is included among the [additional attributes](https://github.com/NoRedInk/live_fixtures/tree/3868aaddbeb1c0174261673855610c4f8d9e7842#additional-attributes). #25
+
 ## [0.3.0] - 2017-08-10
 ### Breaking changes
  - Imports now raise an error when unable to find a referenced model.
