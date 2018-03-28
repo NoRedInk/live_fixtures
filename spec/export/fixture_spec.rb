@@ -153,6 +153,14 @@ describe LiveFixtures::Export::Fixture do
             expect(yaml).to     match /key: "rainbows"/
           end
         end
+
+        context "that include model.id" do
+          let(:more_attributes) { {'id' => model.id} }
+          it "includes the model's id" do
+            expect(yaml).to match /key: "butts"/
+            expect(yaml).to match /id: #{model.id}/
+          end
+        end
       end
     end
   end
