@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2019-02-15
+### Breaking changes
+ - drop support for rails 4.2, ruby < 2.3
+
+### Fixed
+ - support for rails 5
+
+### Added
+ - None
+
 ## [0.3.1] - 2018-03-28
 ### Breaking changes
  - None
