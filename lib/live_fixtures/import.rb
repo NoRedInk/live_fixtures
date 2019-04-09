@@ -65,7 +65,7 @@ class LiveFixtures::Import
           iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
           iterator.new(ff).each do |table_name, label, row|
             conn.insert_fixture(row, table_name)
-            @label_to_id[label] = conn.last_inserted_id(table_name) unless label == NO_LABEL
+            @label_to_id[label] = conn.send(:last_inserted_id, table_name) unless label == NO_LABEL
           end
         end
       end
