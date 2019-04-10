@@ -27,6 +27,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "temping", "~> 3.10"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency "sqlite3", "~> 1.3.13"
+  spec.add_development_dependency "mysql2"
+  spec.add_development_dependency "pg"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "reek"
 end

@@ -6,7 +6,16 @@ require 'temping'
 require 'live_fixtures'
 require 'byebug'
 
-ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+
+case ENV['DB']
+when 'postgres'
+  ActiveRecord::Base.establish_connection(adapter: "postgresql", database: "live_fixtures", username: 'postgres')
+when 'mysql'
+  ActiveRecord::Base.establish_connection(adapter: "mysql2", database: "live_fixtures")
+else
+  ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+end
+
 ActiveRecord::Schema.verbose = false
 ActiveSupport::Inflector.inflections do |inflect|
   inflect.plural "cafe", "cafes"

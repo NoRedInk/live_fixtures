@@ -13,6 +13,9 @@ LiveFixtures uses a different strategy that means it is safer to use in a live e
 
 For more information, see [the motivation section below](#motivation).
 
+## Compatibility
+LiveFixtures is tested against Sqlite3 & mysql. It is known to be incompatible with postrges.
+
 ## Installation
 
 Add this line to your application's Gemfile:
