@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.1] - 2019-04-10
+### Fixed
+  - fixed incompatibility with mysql
+
+### Added
+  - mysql regression test, confirmation that this gem doesn't work with psotgres
+
 ## [1.0.0] - 2019-02-15
 ### Breaking changes
  - drop support for rails 4.2, ruby < 2.3
