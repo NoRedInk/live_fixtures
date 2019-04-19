@@ -2,29 +2,37 @@
 class LiveFixtures::Import
   NO_LABEL = nil
 
+  # Returns the insert order that was specified in the constructor or
+  # the inferred one if none was specified.
+  attr_reader :insert_order
+
   # Instantiate a new Import with the directory containing your fixtures, and
   # the order in which to import them. The order should ensure fixtures
   # containing references to another fixture are imported AFTER the referenced
   # fixture.
   # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
-  # @param insert_order [Array<String>] a list of yml files (without .yml extension) in the order they should be imported.
+  # @param insert_order [Array<String> | Nil] a list of yml files (without .yml extension) in the order they should be imported, or `nil` if these order is to be inferred by this class.
   # @param [Hash] opts export configuration options
   # @option opts [Boolean] show_progress whether or not to show the progress bar
   # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
   # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
-  def initialize(root_path, insert_order, **opts)
+  def initialize(root_path, insert_order = nil, **opts)
     defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: false }
     @options = defaut_options.merge(opts)
     @root_path = root_path
     @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
       File.basename filepath, ".yml"
     end
-    @table_names = insert_order.select {|table_name| @table_names.include? table_name}
-    if @table_names.size < insert_order.size && !@options[:skip_missing_tables]
-      raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{insert_order - @table_names}"
+
+    @insert_order = insert_order
+    @insert_order = InsertionOrderComputer.compute(@table_names) if @insert_order.nil?
+
+    @table_names = @insert_order.select {|table_name| @table_names.include? table_name}
+    if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
+      raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{@insert_order - @table_names}"
     end
     @label_to_id = {}
   end

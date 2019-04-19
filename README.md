@@ -76,7 +76,7 @@ The `LiveFixtures::Export` module is meant to be included into your export class
 
 ### Importing
 
-The `LiveFixtures::Import` class allows you to specify the location of your fixtures and the order in which to import them. Once you've done that, you can import them directly to your database.
+The `LiveFixtures::Import` class allows you to specify the location of your fixtures and, optionally, the order in which to import them. If you don't specify an order, the order will be computed from the ActiveRecord models associations. Once you've done that, you can import them directly to your database.
 
 
     module Seed::User
