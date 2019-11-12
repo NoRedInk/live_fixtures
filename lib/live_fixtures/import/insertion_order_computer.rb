@@ -51,6 +51,9 @@ class LiveFixtures::Import
       nodes.each do |_, node|
         klass = node.klass
         klass.reflect_on_all_associations.each do |assoc|
+          # Don't add a dependency if the class is not in the given table names
+          next unless nodes.key?(assoc.klass)
+
           case assoc.macro
           when :belongs_to
             node.dependencies << assoc.klass
