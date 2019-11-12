@@ -54,6 +54,11 @@ class LiveFixtures::Import
           # Don't add a dependency if the class is not in the given table names
           next unless nodes.key?(assoc.klass)
 
+          # A class might depend on itself, but we don't add it as a dependency
+          # because otherwise we'll never make it (the class can probably be created
+          # just fine and these dependencies are optional/nilable)
+          next if klass == assoc.klass
+
           case assoc.macro
           when :belongs_to
             node.dependencies << assoc.klass
