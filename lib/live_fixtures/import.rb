@@ -34,7 +34,9 @@ class LiveFixtures::Import
     }
 
     @insert_order = insert_order
-    @insert_order = InsertionOrderComputer.compute(@table_names, @class_names) if @insert_order.nil?
+    if @insert_order.nil?
+      @insert_order = InsertionOrderComputer.compute(@table_names, @class_names, compute_polymorphic_associations)
+    end
 
     @table_names = @insert_order.select {|table_name| @table_names.include? table_name}
     if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
@@ -79,6 +81,52 @@ class LiveFixtures::Import
         end
       end
     end
+  end
+
+  private
+
+  # Here we go through each of the fixture YAML files to see what polymorphic
+  # dependencies exist for each of the models.
+  # We do this by inspecting the value of any field that ends with `_type`,
+  # for example `author_type`, `assignment_type`, etc.
+  # Becuase we can't know all the possible types of a polymorphic association
+  # we compute them from the YAML file contents.
+  # Returns a Hash[Class => Set[Class]]
+  def compute_polymorphic_associations
+    polymorphic_associations = Hash.new { |h, k| h[k] = Set.new }
+
+    connection = ActiveRecord::Base.connection
+    files_to_read = @table_names
+
+    files_to_read.each do |path|
+      table_name = path.tr '/', '_'
+      class_name = @class_names[table_name.to_sym] || table_name.classify
+
+      # Here we use the yaml file and YAML.load instead of ActiveRecord::FixtureSet.new
+      # because it's faster and we can also check whether we actually need to
+      # load the file: only if it includes "_type" in it, otherwise there will be
+      # no polymorphic types in there.
+
+      filename = ::File.join(@root_path, "#{path}.yml")
+      file = File.read(filename)
+      next unless file =~ /_type/
+
+      yaml = YAML.load(file)
+      yaml.each do |key, object|
+        object.each do |field, value|
+          next unless  field.ends_with?("_type")
+
+          begin
+            polymorphic_associations[class_name.constantize] << value.constantize
+          rescue NameError
+            # It might be the case that the `..._type` field doesn't actually
+            # refer to a type name, so we just ignore it.
+          end
+        end
+      end
+    end
+
+    polymorphic_associations
   end
 
   class ProgressBarIterator

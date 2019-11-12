@@ -5,6 +5,7 @@ require "live_fixtures/import/insertion_order_computer"
 require "live_fixtures/export"
 require "live_fixtures/export/fixture"
 require "ruby-progressbar"
+require "yaml"
 
 module LiveFixtures
   module_function

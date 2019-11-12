@@ -18,13 +18,14 @@ class LiveFixtures::Import
       end
     end
 
-    def self.compute(table_names, class_names = {})
-      new(table_names, class_names).compute
+    def self.compute(table_names, class_names = {}, polymorphic_associations = {})
+      new(table_names, class_names, polymorphic_associations).compute
     end
 
-    def initialize(table_names, class_names = {})
+    def initialize(table_names, class_names = {}, polymorphic_associations = {})
       @table_names = table_names
       @class_names = class_names
+      @polymorphic_associations = polymorphic_associations
     end
 
     def compute
@@ -46,11 +47,27 @@ class LiveFixtures::Import
                      [klass, Node.new(path, class_name, klass)]
                    end]
 
+      # First iniitalize dependencies from polymorphic associations that we
+      # explicitly found in the yaml files.
+      @polymorphic_associations.each do |klass, associations|
+        associations.each do |association|
+          node = nodes[klass]
+          next unless node
+          next unless nodes.key?(association)
+
+          node.dependencies << association
+        end
+      end
+
       # Compute dependencies between nodes/classes by reflecting on their
       # ActiveRecord associations.
       nodes.each do |_, node|
         klass = node.klass
         klass.reflect_on_all_associations.each do |assoc|
+          # We can't handle polymorphic associations, but the concrete types
+          # should have been deduced from the yaml files contents
+          next if assoc.polymorphic?
+
           # Don't add a dependency if the class is not in the given table names
           next unless nodes.key?(assoc.klass)
 
