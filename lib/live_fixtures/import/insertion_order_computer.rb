@@ -18,12 +18,13 @@ class LiveFixtures::Import
       end
     end
 
-    def self.compute(table_names)
-      new(table_names).compute
+    def self.compute(table_names, class_names = {})
+      new(table_names, class_names).compute
     end
 
-    def initialize(table_names)
+    def initialize(table_names, class_names = {})
       @table_names = table_names
+      @class_names = class_names
     end
 
     def compute
@@ -36,15 +37,10 @@ class LiveFixtures::Import
     # Builds an Array of Nodes, each containing dependencies to other nodes
     # using their class names.
     def build_nodes
-      class_names = {}
-      @table_names.each { |n|
-        class_names[n.tr("/", "_").to_sym] ||= n.classify if n.include?("/")
-      }
-
       # Create a Hash[Class => Node] for each table/class
       nodes = Hash[@table_names.map do |path|
                      table_name = path.tr "/", "_"
-                     class_name = class_names[table_name.to_sym] || table_name.classify
+                     class_name = @class_names[table_name.to_sym] || table_name.classify
                      klass = class_name.constantize
 
                      [klass, Node.new(path, class_name, klass)]

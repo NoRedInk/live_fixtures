@@ -13,13 +13,14 @@ class LiveFixtures::Import
   # @raise [ArgumentError] raises an argument error if not every element in the insert_order has a corresponding yml file.
   # @param root_path [String] path to the directory containing the yml files to import.
   # @param insert_order [Array<String> | Nil] a list of yml files (without .yml extension) in the order they should be imported, or `nil` if these order is to be inferred by this class.
+  # @param class_names [Hash{Symbol => String}] a mapping table name => Model class, for any that don't follow convention.
   # @param [Hash] opts export configuration options
   # @option opts [Boolean] show_progress whether or not to show the progress bar
   # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
   # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
-  def initialize(root_path, insert_order = nil, **opts)
+  def initialize(root_path, insert_order = nil, class_names = {}, **opts)
     defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: false }
     @options = defaut_options.merge(opts)
     @root_path = root_path
@@ -27,8 +28,13 @@ class LiveFixtures::Import
       File.basename filepath, ".yml"
     end
 
+    @class_names = class_names
+    @table_names.each { |n|
+      @class_names[n.tr('/', '_').to_sym] ||= n.classify if n.include?('/')
+    }
+
     @insert_order = insert_order
-    @insert_order = InsertionOrderComputer.compute(@table_names) if @insert_order.nil?
+    @insert_order = InsertionOrderComputer.compute(@table_names, @class_names) if @insert_order.nil?
 
     @table_names = @insert_order.select {|table_name| @table_names.include? table_name}
     if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
@@ -38,7 +44,6 @@ class LiveFixtures::Import
   end
 
   # Within a transaction, import all the fixtures into the database.
-  # @param class_names [Hash{Symbol => String}] a mapping table name => Model class, for any that don't follow convention.
   #
   # The very similar method: ActiveRecord::FixtureSet.create_fixtures has the
   # unfortunate side effect of truncating each table!!
@@ -47,11 +52,7 @@ class LiveFixtures::Import
   # with calling {LiveFixtures::Import::Fixtures#each_table_row_with_label} instead of
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
-  def import_all(class_names = {})
-    @table_names.each { |n|
-      class_names[n.tr('/', '_').to_sym] ||= n.classify if n.include?('/')
-    }
-
+  def import_all
     connection = ActiveRecord::Base.connection
 
     files_to_read = @table_names
@@ -60,7 +61,7 @@ class LiveFixtures::Import
       connection.transaction(requires_new: true) do
         files_to_read.each do |path|
           table_name = path.tr '/', '_'
-          class_name = class_names[table_name.to_sym] || table_name.classify
+          class_name = @class_names[table_name.to_sym] || table_name.classify
 
           ff = Fixtures.new(connection,
                             table_name,

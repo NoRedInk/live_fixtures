@@ -69,4 +69,29 @@ describe LiveFixtures::Import::InsertionOrderComputer do
       expect(insert_order).to eq(%w{xauthors xbooks})
     end
   end
+
+  it "computes for has_many with renamed tables" do
+    Temping.create :xyauthors do
+      with_columns do |t|
+        t.string :name
+      end
+
+      has_many :xybooks
+    end
+
+    Temping.create :xybooks do
+      with_columns do |t|
+        t.integer :xyauthor_id
+        t.string :name
+      end
+    end
+
+    tables = %w{books authors}
+    class_names = {books: "Xybook", authors: "Xyauthor"}
+
+    tables.permutation.each do |permutation|
+      insert_order = LiveFixtures::Import::InsertionOrderComputer.compute(permutation, class_names)
+      expect(insert_order).to eq(%w{authors books})
+    end
+  end
 end
