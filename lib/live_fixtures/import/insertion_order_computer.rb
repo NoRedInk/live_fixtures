@@ -54,15 +54,9 @@ class LiveFixtures::Import
           case assoc.macro
           when :belongs_to
             node.dependencies << assoc.klass
-          when :has_one
-            # Skip through association becuase it will be already computed
-            # for the related `has_one` association
-            next if assoc.options[:through]
-
-            nodes[assoc.klass].dependencies << klass
-          when :has_many
-            # Skip through association becuase it will be already computed
-            # for the related `has_many` association
+          when :has_one, :has_many
+            # Skip `through` association becuase it will be already computed
+            # for the related `has_one`/`has_many` association
             next if assoc.options[:through]
 
             nodes[assoc.klass].dependencies << klass
