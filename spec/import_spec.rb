@@ -5,6 +5,8 @@ describe LiveFixtures::Import do
     allow(ProgressBar).to receive(:create).and_return(
         double(ProgressBar, increment:nil, finished?: nil, finish: nil)
     )
+
+    Flavor.delete_all
     [2077, 2327, 2321, 1744].each do |id|
       Flavor.create do |rt|
         rt.id = id
@@ -16,8 +18,10 @@ describe LiveFixtures::Import do
     root_path = File.join File.dirname(__FILE__),
                           "data/live_fixtures/dog_cafes/"
 
-    importer = LiveFixtures::Import.new root_path,
-      %w{dogs cafes dog_cafes tables}
+    insert_order = %w{dogs cafes dog_cafes tables}
+    importer = LiveFixtures::Import.new root_path, insert_order
+
+    expect(importer.insert_order).to eq(insert_order)
 
     expect { importer.import_all }.
       to  change { Dog.count }.by(3).
@@ -59,6 +63,15 @@ describe LiveFixtures::Import do
 
     expect( visitors.flat_map(&:flavors).map(&:id) ).
         to contain_exactly(2321, 2077, 1744)
+  end
+
+  it "computes insert order if non is specified" do
+    root_path = File.join File.dirname(__FILE__),
+                          "data/live_fixtures/dog_cafes/"
+
+    importer = LiveFixtures::Import.new root_path
+
+    expect(importer.insert_order).to eq(%w{dogs cafes dog_cafes tables})
   end
 end
 
