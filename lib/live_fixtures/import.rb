@@ -34,9 +34,7 @@ class LiveFixtures::Import
     }
 
     @insert_order = insert_order
-    if @insert_order.nil?
-      @insert_order = InsertionOrderComputer.compute(@table_names, @class_names, compute_polymorphic_associations)
-    end
+    @insert_order ||= InsertionOrderComputer.compute(@table_names, @class_names, compute_polymorphic_associations)
 
     @table_names = @insert_order.select {|table_name| @table_names.include? table_name}
     if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
