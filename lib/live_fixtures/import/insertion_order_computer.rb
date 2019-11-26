@@ -39,13 +39,13 @@ class LiveFixtures::Import
     # using their class names.
     def build_nodes
       # Create a Hash[Class => Node] for each table/class
-      nodes = Hash[@table_names.map do |path|
-                     table_name = path.tr "/", "_"
-                     class_name = @class_names[table_name.to_sym] || table_name.classify
-                     klass = class_name.constantize
-
-                     [klass, Node.new(path, class_name, klass)]
-                   end]
+      nodes = {}
+      @table_names.each do |path|
+        table_name = path.tr "/", "_"
+        class_name = @class_names[table_name.to_sym] || table_name.classify
+        klass = class_name.constantize
+        nodes[klass] = Node.new(path, class_name, klass)
+      end
 
       # First iniitalize dependencies from polymorphic associations that we
       # explicitly found in the yaml files.
