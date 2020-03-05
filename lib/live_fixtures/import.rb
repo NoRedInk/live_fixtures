@@ -84,6 +84,7 @@ class LiveFixtures::Import
   def import_some(alternate_imports)
     connection = ActiveRecord::Base.connection
 
+    alternate_imports.map!(&:to_s)
     files_to_read = @table_names
 
     unless files_to_read.empty?
