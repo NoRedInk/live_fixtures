@@ -166,6 +166,7 @@ class LiveFixtures::Import
       @ff = ff
       @bar = LiveFixtures.get_progress_bar(
         total:ff.fixtures.size,
+        # ff.model_class is nil for Module::ClassName models sometimes
         title: ff.model_class.name
       )
     end
