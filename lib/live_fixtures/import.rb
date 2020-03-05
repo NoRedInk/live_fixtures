@@ -102,7 +102,7 @@ class LiveFixtures::Import
 
           conn = ff.model_connection || connection
           if alternate_imports.include?(class_name)
-            yield table_name, class_name, conn, @label_to_id
+            yield table_name, class_name, @label_to_id
           else
             iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
