@@ -52,7 +52,36 @@ class LiveFixtures::Import
   # with calling {LiveFixtures::Import::Fixtures#each_table_row_with_label} instead of
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
-  def import_all(alternate_imports = [])
+  def import_all
+    connection = ActiveRecord::Base.connection
+
+    files_to_read = @table_names
+
+    unless files_to_read.empty?
+      connection.transaction(requires_new: true) do
+        files_to_read.each do |path|
+          table_name = path.tr '/', '_'
+          class_name = @class_names[table_name.to_sym] || table_name.classify
+
+          ff = Fixtures.new(connection,
+                            table_name,
+                            class_name,
+                            ::File.join(@root_path, path),
+                            @label_to_id,
+                            skip_missing_refs: @options[:skip_missing_refs])
+
+          conn = ff.model_connection || connection
+          iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |tname, label, row|
+            conn.insert_fixture(row, tname)
+            @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
+          end
+        end
+      end
+    end
+  end
+
+  def import_some(alternate_imports)
     connection = ActiveRecord::Base.connection
 
     files_to_read = @table_names
