@@ -84,7 +84,7 @@ class LiveFixtures::Import
   def import_some(alternate_imports)
     connection = ActiveRecord::Base.connection
 
-    alternate_imports.map!(&:to_s)
+    # TODO: should be additive with alternate_imports so we can delete the fixture file
     files_to_read = @table_names
 
     unless files_to_read.empty?
@@ -101,8 +101,8 @@ class LiveFixtures::Import
                             skip_missing_refs: @options[:skip_missing_refs])
 
           conn = ff.model_connection || connection
-          if alternate_imports.include?(class_name)
-            yield table_name, class_name, @label_to_id
+          if alternate_imports.include?(table_name)
+            yield table_name, @label_to_id
           else
             iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
