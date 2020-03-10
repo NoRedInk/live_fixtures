@@ -85,6 +85,7 @@ class LiveFixtures::Import
 
   def import_some(alternate_imports)
     connection = ActiveRecord::Base.connection
+    show_progress = @options[:show_progress]
 
     # TODO: should be additive with alternate_imports so we can delete the fixture file
     files_to_read = @table_names
@@ -107,9 +108,9 @@ class LiveFixtures::Import
             time = Benchmark.ms do
               yield table_name, @label_to_id
             end
-            puts "Imported %s in %.0fms" % [table_name, time]
+            puts "Imported %s in %.0fms" % [table_name, time] if show_progress
           else
-            iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
+            iterator = show_progress ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
               conn.insert_fixture(row, tname)
               @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
