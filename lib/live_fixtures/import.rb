@@ -107,7 +107,7 @@ class LiveFixtures::Import
             time = Benchmark.ms do
               yield table_name, @label_to_id
             end
-            puts "Imported %s in %5.3fms" % [table_name, time.to_f]
+            puts "Imported %s in %.0fms" % [table_name, time]
           else
             iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
