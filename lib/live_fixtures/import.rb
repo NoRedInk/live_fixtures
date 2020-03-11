@@ -67,22 +67,23 @@ class LiveFixtures::Import
       connection.transaction(requires_new: true) do
         files_to_read.each do |path|
           table_name = path.tr '/', '_'
-          class_name = @class_names[table_name.to_sym] || table_name.classify
-
-          ff = Fixtures.new(connection,
-                            table_name,
-                            class_name,
-                            ::File.join(@root_path, path),
-                            @label_to_id,
-                            skip_missing_refs: @options[:skip_missing_refs])
-
-          conn = ff.model_connection || connection
           if alternate = @alternate_imports[table_name]
             time = Benchmark.ms do
               alternate.call(@label_to_id)
             end
             puts "Imported %s in %.0fms" % [table_name, time] if show_progress
           else
+            class_name = @class_names[table_name.to_sym] || table_name.classify
+
+            ff = Fixtures.new(connection,
+                              table_name,
+                              class_name,
+                              ::File.join(@root_path, path),
+                              @label_to_id,
+                              skip_missing_refs: @options[:skip_missing_refs])
+
+            conn = ff.model_connection || connection
+
             iterator = show_progress ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
               conn.insert_fixture(row, tname)
