@@ -63,32 +63,32 @@ class LiveFixtures::Import
     # TODO: should be additive with alternate_imports so we can delete the fixture file
     files_to_read = @table_names
 
-    unless files_to_read.empty?
-      connection.transaction(requires_new: true) do
-        files_to_read.each do |path|
-          table_name = path.tr '/', '_'
-          if alternate = @alternate_imports[table_name]
-            time = Benchmark.ms do
-              alternate.call(@label_to_id)
-            end
-            puts "Imported %s in %.0fms" % [table_name, time] if show_progress
-          else
-            class_name = @class_names[table_name.to_sym] || table_name.classify
+    return if files_to_read.empty?
 
-            ff = Fixtures.new(connection,
-                              table_name,
-                              class_name,
-                              ::File.join(@root_path, path),
-                              @label_to_id,
-                              skip_missing_refs: @options[:skip_missing_refs])
+    connection.transaction(requires_new: true) do
+      files_to_read.each do |path|
+        table_name = path.tr '/', '_'
+        if alternate = @alternate_imports[table_name]
+          time = Benchmark.ms do
+            alternate.call(@label_to_id)
+          end
+          puts "Imported %s in %.0fms" % [table_name, time] if show_progress
+        else
+          class_name = @class_names[table_name.to_sym] || table_name.classify
 
-            conn = ff.model_connection || connection
+          ff = Fixtures.new(connection,
+                            table_name,
+                            class_name,
+                            ::File.join(@root_path, path),
+                            @label_to_id,
+                            skip_missing_refs: @options[:skip_missing_refs])
 
-            iterator = show_progress ? ProgressBarIterator : SimpleIterator
-            iterator.new(ff).each do |tname, label, row|
-              conn.insert_fixture(row, tname)
-              @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
-            end
+          conn = ff.model_connection || connection
+
+          iterator = show_progress ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |tname, label, row|
+            conn.insert_fixture(row, tname)
+            @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
           end
         end
       end
