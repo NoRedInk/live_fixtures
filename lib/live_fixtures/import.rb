@@ -8,6 +8,10 @@ class LiveFixtures::Import
   # the inferred one if none was specified.
   attr_reader :insert_order
 
+  # Map of table_name to import routine
+  # @return [Hash<String => Proc>]
+  attr_reader :alternate_imports
+
   # Instantiate a new Import with the directory containing your fixtures, and
   # the order in which to import them. The order should ensure fixtures
   # containing references to another fixture are imported AFTER the referenced
