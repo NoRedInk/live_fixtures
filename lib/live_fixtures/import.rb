@@ -12,6 +12,9 @@ class LiveFixtures::Import
   # @return [Hash<String => Proc>]
   attr_reader :alternate_imports
 
+  # Accessor for string label for a given fixture mapping to it's db id
+  attr_reader :label_to_id
+
   # Instantiate a new Import with the directory containing your fixtures, and
   # the order in which to import them. The order should ensure fixtures
   # containing references to another fixture are imported AFTER the referenced
