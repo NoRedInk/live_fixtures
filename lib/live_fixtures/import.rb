@@ -42,7 +42,9 @@ class LiveFixtures::Import
     if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
       raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{@insert_order - @table_names}"
     end
+
     @label_to_id = {}
+    @alternate_imports = {}
   end
 
   # Within a transaction, import all the fixtures into the database.
@@ -55,35 +57,6 @@ class LiveFixtures::Import
   # `AR::Fixtures#table_rows`, and using those labels to populate `@label_to_id`.
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
   def import_all
-    connection = ActiveRecord::Base.connection
-
-    files_to_read = @table_names
-
-    unless files_to_read.empty?
-      connection.transaction(requires_new: true) do
-        files_to_read.each do |path|
-          table_name = path.tr '/', '_'
-          class_name = @class_names[table_name.to_sym] || table_name.classify
-
-          ff = Fixtures.new(connection,
-                            table_name,
-                            class_name,
-                            ::File.join(@root_path, path),
-                            @label_to_id,
-                            skip_missing_refs: @options[:skip_missing_refs])
-
-          conn = ff.model_connection || connection
-          iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
-          iterator.new(ff).each do |tname, label, row|
-            conn.insert_fixture(row, tname)
-            @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
-          end
-        end
-      end
-    end
-  end
-
-  def import_some(alternate_imports)
     connection = ActiveRecord::Base.connection
     show_progress = @options[:show_progress]
 
@@ -104,9 +77,9 @@ class LiveFixtures::Import
                             skip_missing_refs: @options[:skip_missing_refs])
 
           conn = ff.model_connection || connection
-          if alternate_imports.include?(table_name)
+          if alternate = @alternate_imports[table_name]
             time = Benchmark.ms do
-              yield table_name, @label_to_id
+              alternate.call(@label_to_id)
             end
             puts "Imported %s in %.0fms" % [table_name, time] if show_progress
           else
@@ -119,6 +92,11 @@ class LiveFixtures::Import
         end
       end
     end
+  end
+
+  def override(table, proc)
+    @alternate_imports[table] = proc
+    self
   end
 
   private
