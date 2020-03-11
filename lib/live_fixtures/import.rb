@@ -95,8 +95,11 @@ class LiveFixtures::Import
     end
   end
 
-  def override(table, proc)
-    @alternate_imports[table] = proc
+  # Override import of table using a callable object
+  # @param table_name [String] table to use callable instead of fixture file
+  # @param callable [Proc] Proc/lambda that will be called with @label_to_id
+  def override(table_name, callable)
+    @alternate_imports[table_name] = callable
     self
   end
 
