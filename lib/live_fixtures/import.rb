@@ -27,14 +27,25 @@ class LiveFixtures::Import
   # @option opts [Boolean] show_progress whether or not to show the progress bar
   # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
   # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
+  # @option opts [Boolean] use_insert_order_as_table_names when true, table names will be those passed in insert_order, not read from yaml files
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order = nil, class_names = {}, **opts)
-    defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: false }
+    defaut_options = {
+      show_progress: true,
+      skip_missing_tables: false,
+      skip_missing_refs: false,
+      use_insert_order_as_table_names: false,
+    }
     @options = defaut_options.merge(opts)
     @root_path = root_path
-    @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
-      File.basename filepath, ".yml"
+
+    if insert_order && @options[:use_insert_order_as_table_names]
+      @table_names = insert_order
+    else
+      @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
+        File.basename filepath, ".yml"
+      end
     end
 
     @class_names = class_names
