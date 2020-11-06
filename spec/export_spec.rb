@@ -60,6 +60,10 @@ describe LiveFixtures::Export do
       expect(File).to_not receive(:write)
       MyExport.new.do_export []
     end
+
+    it "returns an empty array" do
+      expect(MyExport.new.do_export([])).to eq([])
+    end
   end
 
   context "when exporting some Level and their Tricks" do
@@ -110,38 +114,50 @@ describe LiveFixtures::Export do
     end
 
     it "produces the expected level yaml file" do
+      yaml_header =
+        <<~YAML
+          _fixture:
+            model_class: Level
+        YAML
+
       level_yaml = levels.map do |level|
-        <<-YML
-levels_#{level.id}:
-  score: #{level.score}
-  dog_id: #{level.dog_id}
-  trick: tricks_#{level.trick_id}
-  rubric: |-
-#{level.rubric.to_yaml.indent(4)}
-  created_at: #{level.created_at.utc.to_s(:db)}
-  hash: #{level.hash}
+        <<~YML
+          levels_#{level.id}:
+            score: #{level.score}
+            dog_id: #{level.dog_id}
+            trick: tricks_#{level.trick_id}
+            rubric: |-
+          #{level.rubric.to_yaml.indent(4)}
+            created_at: #{level.created_at.utc.to_s(:db)}
+            hash: #{level.hash}
 
         YML
       end
 
-      expect(level_file.string).to eq level_yaml.join
+      expect(level_file.string).to eq (yaml_header + level_yaml.join)
     end
 
     it "produces the expected tricks yaml file" do
+      yaml_header =
+        <<~YAML
+          _fixture:
+            model_class: Trick
+        YAML
+
       tricks_yaml = tricks.map do |trick|
-        <<-YML
-tricks_#{trick.id}:
-  name: "#{trick.name}"
-  prerequisites: |-
-#{trick.prerequisites.to_json.indent(4)}
-  instructions: |-
-#{trick.instructions.to_yaml.indent(4)}
-  frisbee: #{trick.frisbee}
+        <<~YML
+          tricks_#{trick.id}:
+            name: "#{trick.name}"
+            prerequisites: |-
+          #{trick.prerequisites.to_json.indent(4)}
+            instructions: |-
+          #{trick.instructions.to_yaml.indent(4)}
+            frisbee: #{trick.frisbee}
 
         YML
       end
 
-      expect(tricks_file.string).to eq tricks_yaml.join
+      expect(tricks_file.string).to eq (yaml_header + tricks_yaml.join)
     end
   end
 end
