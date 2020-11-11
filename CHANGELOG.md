@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.0] - 2020-11-11
+### Breaking changes
+This is a breaking change because LiveFixtures::Import.new now needs to receive the class_names Hash to be able to correctly compute the insert_order in case there are some unconventional class names associations. And the class_names argument is removed from import_all. But this is the only change.
+
+### Added
+  - compute insert_order automatically (#33)
+
 ## [1.0.1] - 2019-04-10
 ### Fixed
   - fixed incompatibility with mysql
