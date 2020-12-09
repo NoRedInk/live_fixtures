@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2020-12-09
+### Added
+support rails 6, ruby 1.66, 1.7.2
+
+### Removed
+drop support for legacy rubies. Chose not to do a major version bump BUT MAYBE I WAS WRONG!
+
+
 ## [2.1.0] - 2020-12-09
 ### Added
 support for selectively import tables with custom callbacks per table (#34)
