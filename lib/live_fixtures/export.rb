@@ -55,10 +55,15 @@ module LiveFixtures::Export
   # @yieldparam model [ActiveRecord::Base] each successive model.
   # @yieldreturn [Hash{String => Object}] a hash of attributes to be merged and saved with the model's attributes.
   def export_fixtures(models, with_references = [])
-    return unless models.present?
+    return [] unless models.present?
 
-    table_name = models.first.class.table_name
-    File.open(File.join(@dir, table_name + '.yml'), 'w') do |file|
+    model_class = models.first.class
+
+    File.open(File.join(@dir, model_class.table_name + '.yml'), 'w') do |file|
+      file.write <<~PRELUDE
+        _fixture:
+          model_class: #{model_class.name}
+      PRELUDE
 
       iterator = export_options[:show_progress] ? ProgressBarIterator : SimpleIterator
 
@@ -66,7 +71,6 @@ module LiveFixtures::Export
         more_attributes = block_given? ? yield(model) : {}
         file.write Fixture.to_yaml(model, with_references, more_attributes)
       end
-
     end
   end
 

@@ -1,3 +1,5 @@
+require 'benchmark'
+
 # An object that facilitates the import of fixtures into a database.
 class LiveFixtures::Import
   NO_LABEL = nil
@@ -5,6 +7,13 @@ class LiveFixtures::Import
   # Returns the insert order that was specified in the constructor or
   # the inferred one if none was specified.
   attr_reader :insert_order
+
+  # Map of table_name to import routine
+  # @return [Hash<String => Proc>]
+  attr_reader :alternate_imports
+
+  # Accessor for string label for a given fixture mapping to it's db id
+  attr_reader :label_to_id
 
   # Instantiate a new Import with the directory containing your fixtures, and
   # the order in which to import them. The order should ensure fixtures
@@ -18,14 +27,25 @@ class LiveFixtures::Import
   # @option opts [Boolean] show_progress whether or not to show the progress bar
   # @option opts [Boolean] skip_missing_tables when false, an error will be raised if a yaml file isn't found for each table in insert_order
   # @option opts [Boolean] skip_missing_refs when false, an error will be raised if an ID isn't found for a label.
+  # @option opts [Boolean] use_insert_order_as_table_names when true, table names will be those passed in insert_order, not read from yaml files
   # @return [LiveFixtures::Import] an importer
   # @see LiveFixtures::Export::Reference
   def initialize(root_path, insert_order = nil, class_names = {}, **opts)
-    defaut_options = { show_progress: true, skip_missing_tables: false, skip_missing_refs: false }
+    defaut_options = {
+      show_progress: true,
+      skip_missing_tables: false,
+      skip_missing_refs: false,
+      use_insert_order_as_table_names: false,
+    }
     @options = defaut_options.merge(opts)
     @root_path = root_path
-    @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
-      File.basename filepath, ".yml"
+
+    if insert_order && @options[:use_insert_order_as_table_names]
+      @table_names = insert_order
+    else
+      @table_names = Dir.glob(File.join(@root_path, '{*,**}/*.yml')).map do |filepath|
+        File.basename filepath, ".yml"
+      end
     end
 
     @class_names = class_names
@@ -40,7 +60,9 @@ class LiveFixtures::Import
     if @table_names.size < @insert_order.size && !@options[:skip_missing_tables]
       raise ArgumentError, "table(s) mentioned in `insert_order` which has no yml file to import: #{@insert_order - @table_names}"
     end
+
     @label_to_id = {}
+    @alternate_imports = {}
   end
 
   # Within a transaction, import all the fixtures into the database.
@@ -54,13 +76,22 @@ class LiveFixtures::Import
   # @see https://github.com/rails/rails/blob/4-2-stable/activerecord/lib/active_record/fixtures.rb#L496
   def import_all
     connection = ActiveRecord::Base.connection
+    show_progress = @options[:show_progress]
 
+    # TODO: should be additive with alternate_imports so we can delete the fixture file
     files_to_read = @table_names
 
-    unless files_to_read.empty?
-      connection.transaction(requires_new: true) do
-        files_to_read.each do |path|
-          table_name = path.tr '/', '_'
+    return if files_to_read.empty?
+
+    connection.transaction(requires_new: true) do
+      files_to_read.each do |path|
+        table_name = path.tr '/', '_'
+        if alternate = @alternate_imports[table_name]
+          time = Benchmark.ms do
+            alternate.call(@label_to_id)
+          end
+          puts "Imported %s in %.0fms" % [table_name, time] if show_progress
+        else
           class_name = @class_names[table_name.to_sym] || table_name.classify
 
           ff = Fixtures.new(connection,
@@ -71,14 +102,23 @@ class LiveFixtures::Import
                             skip_missing_refs: @options[:skip_missing_refs])
 
           conn = ff.model_connection || connection
-          iterator = @options[:show_progress] ? ProgressBarIterator : SimpleIterator
-          iterator.new(ff).each do |table_name, label, row|
-            conn.insert_fixture(row, table_name)
-            @label_to_id[label] = conn.send(:last_inserted_id, table_name) unless label == NO_LABEL
+
+          iterator = show_progress ? ProgressBarIterator : SimpleIterator
+          iterator.new(ff).each do |tname, label, row|
+            conn.insert_fixture(row, tname)
+            @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
           end
         end
       end
     end
+  end
+
+  # Override import of table using a callable object
+  # @param table_name [String] table to use callable instead of fixture file
+  # @param callable [Proc] Proc/lambda that will be called with @label_to_id
+  def override(table_name, callable)
+    @alternate_imports[table_name] = callable
+    self
   end
 
   private
@@ -131,7 +171,7 @@ class LiveFixtures::Import
     def initialize(ff)
       @ff = ff
       @bar = LiveFixtures.get_progress_bar(
-        total:ff.fixtures.size,
+        total: ff.fixtures.size,
         title: ff.model_class.name
       )
     end

@@ -73,6 +73,33 @@ describe LiveFixtures::Import do
 
     expect(importer.insert_order).to eq(%w{dogs cafes dog_cafes tables})
   end
+
+  it "uses insert order even if underlying yml file doesn't exist when use_insert_order_as_table_names is true " do
+    root_path = File.join File.dirname(__FILE__),
+                          "data/live_fixtures/dog_cafes/"
+
+    insert_order = %w{unknown dogs}
+    importer = LiveFixtures::Import.new(
+      root_path, insert_order, {},
+      use_insert_order_as_table_names: true,
+    )
+
+    called = false
+    importer.override('unknown', ->(label_to_id) {
+      called = true
+    })
+
+    expect(importer.insert_order).to eq(insert_order)
+
+    expect { importer.import_all }.
+      to  change { Dog.count }.by(3).
+      and change { DogCafe.count }.by(0).
+      and change { Cafe.count }.by(0).
+      and change { Table.count }.by(0).
+      and change { LowTable.count }.by(0)
+
+    expect(called).to eq(true)
+  end
 end
 
 def next_dogname(dogname)
