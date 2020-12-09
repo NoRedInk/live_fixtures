@@ -1,3 +1,4 @@
+require 'fileutils'
 # This module is meant to be `include`ed into your export class.
 #
 # 1. Call #set_export_dir to set the dir where files should be created.

@@ -1,10 +1,11 @@
 language: ruby
 rvm:
-  - 2.5.3
+  - 2.6.6
+  - 2.7.2
 cache: bundler
 before_install:
   - gem update --system
-  - gem install bundler
+  - gem update bundler
 services:
   - mysql
 env:
@@ -12,3 +13,7 @@ env:
   - DB=mysql
 before_script:
   bundle exec rake db:create
+
+gemfile:
+  - gemfiles/activerecord_5.2.gemfile
+  - gemfiles/activerecord_6.0.gemfile
