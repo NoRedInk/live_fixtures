@@ -2,7 +2,7 @@
 # since bundix doesn't support reading the gemspec itself.
 source 'https://rubygems.org'
 
-gem 'activerecord', '~> 5.2'
+gem 'activerecord', '~> 6.1'
 gem 'ruby-progressbar'
 
 group :development do
