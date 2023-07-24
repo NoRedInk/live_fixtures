@@ -2,15 +2,15 @@
 # since bundix doesn't support reading the gemspec itself.
 source 'https://rubygems.org'
 
-gem 'activerecord', '~> 5.2'
+gem 'activerecord', '~> 6.0'
 gem 'ruby-progressbar'
 
 group :development do
   gem 'rake', '~> 12.3'
   gem 'rspec', '~> 3.8'
-  gem 'temping', '~> 3.10'
+  gem 'temping', '~> 4.0'
   gem 'byebug'
-  gem 'sqlite3', '~> 1.3.10'
+  gem 'sqlite3', '~> 1.4'
   gem 'mysql2'
   gem 'pg'
   gem 'yard'
