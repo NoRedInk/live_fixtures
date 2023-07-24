@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2023-07-24
+### Added
+support ruby >= 3.1
+
+### Removed
+drop support for ruby < 3.1, rails < 6.0
+
 ## [2.2.0] - 2020-12-09
 ### Added
 support rails 6, ruby 1.66, 1.7.2
