@@ -1,7 +1,6 @@
 language: ruby
 rvm:
-  - 2.6.6
-  - 2.7.2
+  - 3.1.4
 cache: bundler
 before_install:
   - gem update --system
@@ -15,5 +14,4 @@ before_script:
   bundle exec rake db:create
 
 gemfile:
-  - gemfiles/activerecord_5.2.gemfile
   - gemfiles/activerecord_6.0.gemfile
