@@ -66,12 +66,12 @@ class LiveFixtures::Import
       end
 
       join_table_rows.each do |table_name, rows|
-        rows.each do |targets:, association:, label:|
-          targets.each do |target|
+        rows.each do |row|
+          row[:targets].each do |target|
             assoc_fk = @label_to_id[target] || target
-            row = { association.foreign_key             => fetch_id_for_label(label),
-                    association.association_foreign_key => assoc_fk }
-            yield [table_name, NO_LABEL, row]
+            row_with_fk = { row[:association].foreign_key             => fetch_id_for_label(row[:label]),
+                            row[:association].association_foreign_key => assoc_fk }
+            yield [table_name, NO_LABEL, row_with_fk]
           end
         end
       end
