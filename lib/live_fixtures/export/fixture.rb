@@ -7,15 +7,16 @@ module LiveFixtures::Export::Fixture
   # @param model [ActiveRecord::Base] an ActiveRecord record to serialize
   # @param references [Symbol, Array<Symbol>] the names of associations whose foreign_keys should be replaced with references
   # @param more_attributes [Hash{String => Time, DateTime, Date, Hash, String, LiveFixtures::Export::Template, LiveFixtures::Export::Reference, #to_s}] a hash of additional attributes to serialize with each record.
+  # @param skip_attributes [Array<String>] a list of attributes to skip when serializing the model
   # @return [String] the model serialized in YAML, with specified foreign_keys replaced by references, including additional attributes.
-  def to_yaml(model, references = [], more_attributes = {})
+  def to_yaml(model, references = [], more_attributes = {}, skip_attributes: [])
     table_name = model.class.table_name
 
     more_attributes.merge! attributes_from_references(model, references)
 
     <<-YML
 #{table_name}_#{model.id || SecureRandom.uuid.underscore}:
-  #{yml_attributes(model, more_attributes)}
+  #{yml_attributes(model, more_attributes, skip_attributes)}
 
     YML
   end
@@ -35,9 +36,10 @@ module LiveFixtures::Export::Fixture
     end
   end
 
-  private_class_method def yml_attributes(model, more_attributes)
+  private_class_method def yml_attributes(model, more_attributes, skip_attributes)
     model.attributes.except("id").merge(more_attributes).map do |name, value|
       next if value.nil?
+      next if skip_attributes.include?(name)
 
       serialize_attribute(model, name, value)
     end.compact.join("\n  ")

@@ -6,7 +6,8 @@ describe LiveFixtures::Export::Fixture do
     let(:yaml) {
       LiveFixtures::Export::Fixture.to_yaml(model,
                                             references,
-                                            more_attributes)
+                                            more_attributes,
+                                            skip_attributes: skip_attributes)
     }
     let(:model) { new_model(table_name, attributes) }
     let(:table_name) { 'tables' }
@@ -14,6 +15,7 @@ describe LiveFixtures::Export::Fixture do
     let(:type_for_attribute) { instance_double('ActiveRecord::Type') }
     let(:references) { [] }
     let(:more_attributes) { {} }
+    let(:skip_attributes) { [] }
 
     def new_model(table_name, attributes={})
       double('Model',
@@ -160,6 +162,13 @@ describe LiveFixtures::Export::Fixture do
             expect(yaml).to match /key: "butts"/
             expect(yaml).to match /id: #{model.id}/
           end
+        end
+      end
+
+      context "when skip_attributes are specified" do
+        let(:skip_attributes) { ['key'] }
+        it "does not include them" do
+          expect(yaml).to_not match /key: "butts"/
         end
       end
     end
