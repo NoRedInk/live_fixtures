@@ -48,6 +48,7 @@ module LiveFixtures::Export
   # Export models to a yml file named after the corresponding table.
   # @param models [Enumerable] an Enumerable containing ActiveRecord models.
   # @param with_references [Array<Symbol>] the associations whose foreign_keys should be replaced with references.
+  # @param skip_attributes [Array<String>] the attributes to skip when exporting the model.
   #
   # Takes an optional block that will be invoked for each model.
   # The block should return a hash of attributes to be merged and
@@ -55,7 +56,7 @@ module LiveFixtures::Export
   # @yield [model] an optional block that will be invoked for each model.
   # @yieldparam model [ActiveRecord::Base] each successive model.
   # @yieldreturn [Hash{String => Object}] a hash of attributes to be merged and saved with the model's attributes.
-  def export_fixtures(models, with_references = [])
+  def export_fixtures(models, with_references = [], skip_attributes: [])
     return [] unless models.present?
 
     model_class = models.first.class
@@ -70,7 +71,7 @@ module LiveFixtures::Export
 
       iterator.new(models).each do |model|
         more_attributes = block_given? ? yield(model) : {}
-        file.write Fixture.to_yaml(model, with_references, more_attributes)
+        file.write Fixture.to_yaml(model, with_references, more_attributes, skip_attributes: skip_attributes)
       end
     end
   end

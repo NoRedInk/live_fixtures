@@ -18,6 +18,7 @@ Temping.create :level do
     t.integer :dog_id
     t.integer :trick_id
     t.text :rubric
+    t.integer :ignore
     t.datetime :created_at
   end
 
@@ -36,7 +37,7 @@ describe LiveFixtures::Export do
     def do_export(levels)
       set_export_dir DIR
 
-      export_fixtures(levels, :trick) do |level|
+      export_fixtures(levels, :trick, skip_attributes: ['ignore']) do |level|
         { 'hash' => level.hash,
           'rubric' => level.rubric.to_yaml }
       end
@@ -90,6 +91,7 @@ describe LiveFixtures::Export do
           m.dog_id = 7
           m.trick_id = tricks.first.id
           m.rubric = {pizzaz: 2, shininess:4}
+          m.ignore = 1
           m.created_at = Time.now
         end),
         (Level.create do |m|
