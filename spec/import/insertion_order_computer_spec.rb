@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe LiveFixtures::Import::InsertionOrderComputer do
-  it "computes for belongs_to" do
+  it 'computes for belongs_to' do
     Temping.create :authors do
       with_columns do |t|
         t.string :name
@@ -17,14 +19,14 @@ describe LiveFixtures::Import::InsertionOrderComputer do
       belongs_to :author
     end
 
-    tables = %w{books authors}
+    tables = %w[books authors]
     tables.permutation.each do |permutation|
       insert_order = LiveFixtures::Import::InsertionOrderComputer.compute(permutation)
-      expect(insert_order).to eq(%w{authors books})
+      expect(insert_order).to eq(%w[authors books])
     end
   end
 
-  it "computes for has_one" do
+  it 'computes for has_one' do
     Temping.create :supplier do
       with_columns do |t|
         t.string :name
@@ -40,14 +42,14 @@ describe LiveFixtures::Import::InsertionOrderComputer do
       end
     end
 
-    tables = %w{account supplier}
+    tables = %w[account supplier]
     tables.permutation.each do |permutation|
       insert_order = LiveFixtures::Import::InsertionOrderComputer.compute(permutation)
-      expect(insert_order).to eq(%w{supplier account})
+      expect(insert_order).to eq(%w[supplier account])
     end
   end
 
-  it "computes for has_many" do
+  it 'computes for has_many' do
     Temping.create :xauthors do
       with_columns do |t|
         t.string :name
@@ -63,14 +65,14 @@ describe LiveFixtures::Import::InsertionOrderComputer do
       end
     end
 
-    tables = %w{xbooks xauthors}
+    tables = %w[xbooks xauthors]
     tables.permutation.each do |permutation|
       insert_order = LiveFixtures::Import::InsertionOrderComputer.compute(permutation)
-      expect(insert_order).to eq(%w{xauthors xbooks})
+      expect(insert_order).to eq(%w[xauthors xbooks])
     end
   end
 
-  it "computes for has_many with renamed tables" do
+  it 'computes for has_many with renamed tables' do
     Temping.create :xyauthors do
       with_columns do |t|
         t.string :name
@@ -86,12 +88,12 @@ describe LiveFixtures::Import::InsertionOrderComputer do
       end
     end
 
-    tables = %w{books authors}
-    class_names = {books: "Xybook", authors: "Xyauthor"}
+    tables = %w[books authors]
+    class_names = { books: 'Xybook', authors: 'Xyauthor' }
 
     tables.permutation.each do |permutation|
       insert_order = LiveFixtures::Import::InsertionOrderComputer.compute(permutation, class_names)
-      expect(insert_order).to eq(%w{authors books})
+      expect(insert_order).to eq(%w[authors books])
     end
   end
 end
