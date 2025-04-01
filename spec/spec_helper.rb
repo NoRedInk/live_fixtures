@@ -63,7 +63,7 @@ Temping.create :cafe do
   has_many :visitors, through: :dog_cafes, source: :dog, class_name: 'Dog'
   has_many :tables
 
-  serialize :menu, JSON
+  serialize :menu, coder: JSON
   serialize :chefs
 end
 

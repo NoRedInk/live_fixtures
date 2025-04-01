@@ -10,7 +10,7 @@ Temping.create :trick do
     t.boolean :frisbee
   end
 
-  serialize :prerequisites, JSON
+  serialize :prerequisites, coder: JSON
   serialize :instructions
 end
 
