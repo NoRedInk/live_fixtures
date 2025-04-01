@@ -9,8 +9,13 @@ let
     ruby = nixpkgs.ruby_3_1;
     gemdir = ./nix;
   };
-in with nixpkgs;
+in
+with nixpkgs;
 stdenv.mkDerivation {
   name = "live_fixtures";
-  buildInputs = [ gems gems.wrappedRuby ];
+  buildInputs = [
+    gems
+    gems.wrappedRuby
+    pkgs.niv
+  ];
 }

@@ -11,8 +11,6 @@ group :development do
   gem 'temping', '~> 4.0'
   gem 'byebug'
   gem 'sqlite3', '~> 1.4'
-  gem 'mysql2'
-  gem 'pg'
   gem 'yard'
   gem 'reek'
 end
