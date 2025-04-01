@@ -1,24 +1,26 @@
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+# frozen_string_literal: true
 
-require "active_record"
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+
+require 'logger'
+require 'active_record'
 require 'ruby-progressbar'
 require 'temping'
 require 'live_fixtures'
 require 'byebug'
 
-
-case ENV['DB']
+case ENV.fetch('DB', nil)
 when 'postgres'
-  ActiveRecord::Base.establish_connection(adapter: "postgresql", database: "live_fixtures", username: 'postgres')
+  ActiveRecord::Base.establish_connection(adapter: 'postgresql', database: 'live_fixtures', username: 'postgres')
 when 'mysql'
-  ActiveRecord::Base.establish_connection(adapter: "mysql2", database: "live_fixtures")
+  ActiveRecord::Base.establish_connection(adapter: 'mysql2', database: 'live_fixtures')
 else
-  ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: ":memory:")
+  ActiveRecord::Base.establish_connection(adapter: 'sqlite3', database: ':memory:')
 end
 
 ActiveRecord::Schema.verbose = false
 ActiveSupport::Inflector.inflections do |inflect|
-  inflect.plural "cafe", "cafes"
+  inflect.plural 'cafe', 'cafes'
 end
 
 Temping.create :flavor do

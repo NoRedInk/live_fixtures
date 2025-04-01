@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 Temping.create :trick do
@@ -27,8 +29,6 @@ Temping.create :level do
   serialize :rubric
 end
 
-
-
 describe LiveFixtures::Export do
   class MyExport
     DIR = '/tmp/live_fixtures/export/test'
@@ -47,41 +47,41 @@ describe LiveFixtures::Export do
   end
 
   before do
-    allow(ProgressBar).to receive(:create).and_return double(increment:nil)
+    allow(ProgressBar).to receive(:create).and_return double(increment: nil)
   end
 
   let(:level_file) { StringIO.new }
-  let(:tricks_file ) { StringIO.new }
+  let(:tricks_file) { StringIO.new }
 
-  let(:level_filepath) { File.join(MyExport::DIR, "levels.yml") }
-  let(:tricks_filepath ) { File.join(MyExport::DIR, "tricks.yml") }
+  let(:level_filepath) { File.join(MyExport::DIR, 'levels.yml') }
+  let(:tricks_filepath) { File.join(MyExport::DIR, 'tricks.yml') }
 
-  context "when exporting nothing" do
-    it "never opens a file" do
-      expect(File).to_not receive(:write)
+  context 'when exporting nothing' do
+    it 'never opens a file' do
+      expect(File).not_to receive(:write)
       MyExport.new.do_export []
     end
 
-    it "returns an empty array" do
+    it 'returns an empty array' do
       expect(MyExport.new.do_export([])).to eq([])
     end
   end
 
-  context "when exporting some Level and their Tricks" do
+  context 'when exporting some Level and their Tricks' do
     let(:tricks) do
       [
         (Trick.create do |t|
-           t.name = "Trick 1"
+           t.name = 'Trick 1'
            t.prerequisites = {}
-           t.instructions = ["Sit", "Shake", "Sit"]
+           t.instructions = %w[Sit Shake Sit]
            t.frisbee = false
          end),
         (Trick.create do |t|
-           t.name = "Trick 2"
-           t.prerequisites = {trick: "Trick 1"}
+           t.name = 'Trick 2'
+           t.prerequisites = { trick: 'Trick 1' }
            t.instructions = []
            t.frisbee = true
-         end),
+         end)
       ]
     end
     let(:levels) do
@@ -90,7 +90,7 @@ describe LiveFixtures::Export do
           m.score = 100
           m.dog_id = 7
           m.trick_id = tricks.first.id
-          m.rubric = {pizzaz: 2, shininess:4}
+          m.rubric = { pizzaz: 2, shininess: 4 }
           m.ignore = 1
           m.created_at = Time.now
         end),
@@ -100,22 +100,22 @@ describe LiveFixtures::Export do
           m.trick_id = tricks.last.id
           m.rubric = {}
           m.created_at = Time.now
-        end),
+        end)
       ]
     end
 
     before do
       expect(File).to receive(:open).with(level_filepath, 'w').and_yield level_file
-      expect(File).to receive(:open).with(tricks_filepath,  'w').and_yield tricks_file
+      expect(File).to receive(:open).with(tricks_filepath, 'w').and_yield tricks_file
 
       MyExport.new.do_export levels
     end
 
-    it "creates the required directory" do
+    it 'creates the required directory' do
       Dir.exist? MyExport::DIR
     end
 
-    it "produces the expected level yaml file" do
+    it 'produces the expected level yaml file' do
       yaml_header =
         <<~YAML
           _fixture:
@@ -136,10 +136,10 @@ describe LiveFixtures::Export do
         YML
       end
 
-      expect(level_file.string).to eq (yaml_header + level_yaml.join)
+      expect(level_file.string).to eq(yaml_header + level_yaml.join)
     end
 
-    it "produces the expected tricks yaml file" do
+    it 'produces the expected tricks yaml file' do
       yaml_header =
         <<~YAML
           _fixture:
@@ -159,7 +159,7 @@ describe LiveFixtures::Export do
         YML
       end
 
-      expect(tricks_file.string).to eq (yaml_header + tricks_yaml.join)
+      expect(tricks_file.string).to eq(yaml_header + tricks_yaml.join)
     end
   end
 end
