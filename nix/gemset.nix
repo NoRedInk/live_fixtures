@@ -113,16 +113,6 @@
     };
     version = "5.18.1";
   };
-  mysql2 = {
-    groups = ["development"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "0d14pcy5m4hjig0zdxnl9in5f4izszc7v9zcczf2gyi5kiyxk8jw";
-      type = "gem";
-    };
-    version = "0.5.3";
-  };
   parser = {
     dependencies = ["ast"];
     groups = ["default" "development"];
@@ -133,16 +123,6 @@
       type = "gem";
     };
     version = "2.7.2.0";
-  };
-  pg = {
-    groups = ["development"];
-    platforms = [];
-    source = {
-      remotes = ["https://rubygems.org"];
-      sha256 = "13mfrysrdrh8cka1d96zm0lnfs59i5x2g6ps49r2kz5p3q81xrzj";
-      type = "gem";
-    };
-    version = "1.2.3";
   };
   psych = {
     groups = ["default" "development"];
