@@ -285,11 +285,31 @@ reflected in the order of the `@table_names` array.
 
 ## Development
 
+This project uses nix to manage the dev environment.
+
+This project additionally uses
+- [direnv](https://github.com/direnv/direnv)
+- flakes
+
+If you don't have flakes enabled, you can enable them by adding `experimental-features = flakes` to your `~/.config/nix/nix.conf` file.
+(or running )
+
+typing `direnv allow` loads the dev environment including a compatible ruby, sqlite, and gems.
+
+To modify gem dependencies, use the bundle wrappers
+- `bundle-lock` to update the lockfile
+- `bundle-update` to update gems & the lockfile
+then run `bundix` to update the `gemset.nix` file.
+
+### Usage Without Nix
+
+Usage without nix is unsupported but may work anyways. Try the following:
+
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
 
-Please remember to update the docs on your PR if you change anything. You can see the YARD docs live while you change them by running `yard server --reload`.
+Note: We only support adding gems and dependencies using nix.
 
 ## Contributing
 
