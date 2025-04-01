@@ -393,7 +393,14 @@
       target = "ruby";
       type = "gem";
     };
-    targets = [];
+    targets = [{
+      remotes = ["https://rubygems.org"];
+      sha256 = "0wzflcbl468linz00286g46xnwz8h1wwk02q8r9q5v0dcs2k4ajj";
+      target = "x86_64-linux";
+      targetCPU = "x86_64";
+      targetOS = "linux";
+      type = "gem";
+    }];
     version = "1.7.3";
   };
   temping = {

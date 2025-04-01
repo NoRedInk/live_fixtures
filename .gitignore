@@ -1,13 +1,9 @@
 .bundle/
 .direnv/
 /.yardoc
-/Gemfile.lock
 /_yardoc/
 /coverage/
 /doc/
 /pkg/
 /spec/reports/
 /tmp/
-
-# nixified bundle
-/nix/vendor
