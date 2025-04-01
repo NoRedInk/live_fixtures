@@ -16,5 +16,6 @@ stdenv.mkDerivation {
   buildInputs = [
     gems
     gems.wrappedRuby
+    pkgs.niv
   ];
 }
