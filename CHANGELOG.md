@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [4.0.0] - Unreleased
+### Added
+Support for Ruby 3.2, active record 7
+
+### Removed
+Dropped support for Ruby < 3.2, Rails < 7.0
+
 ## [3.1.1] - 2024-04-04
 ### Fixed
 Expose the `skip_attributes` option in LiveFixtures::Export.
