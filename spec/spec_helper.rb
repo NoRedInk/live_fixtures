@@ -7,7 +7,7 @@ require 'active_record'
 require 'ruby-progressbar'
 require 'temping'
 require 'live_fixtures'
-require 'byebug'
+require 'pry-byebug'
 
 case ENV.fetch('DB', nil)
 when 'postgres'
