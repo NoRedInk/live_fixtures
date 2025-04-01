@@ -7,7 +7,7 @@ gemspec
 
 # dev dependencies
 gem 'bundler', '~> 2.1'
-gem 'byebug'
+gem 'pry-byebug'
 gem 'rake', '~> 13.0'
 gem 'rspec', '~> 3.10'
 gem 'rubocop'

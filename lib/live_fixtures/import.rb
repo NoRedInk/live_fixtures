@@ -109,8 +109,8 @@ module LiveFixtures
 
             iterator = show_progress ? ProgressBarIterator : SimpleIterator
             iterator.new(ff).each do |tname, label, row|
-              conn.insert_fixture(row, tname)
-              @label_to_id[label] = conn.send(:last_inserted_id, tname) unless label == NO_LABEL
+              last_inserted_id = conn.insert(conn.send(:build_fixture_sql, Array.wrap(row), tname))
+              @label_to_id[label] = last_inserted_id unless label == NO_LABEL
             end
           end
         end

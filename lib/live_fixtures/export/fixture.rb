@@ -66,9 +66,9 @@ module LiveFixtures
       private_class_method def yml_value(value)
         case value
         when Time, DateTime
-          value.utc.to_s(:db)
+          value.utc.to_fs(:db)
         when Date
-          value.to_s(:db)
+          value.to_fs(:db)
         when Hash
           value.to_yaml.inspect
         when String
