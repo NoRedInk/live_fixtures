@@ -21,15 +21,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", ">= 6.0", "< 7.0.0"
   spec.add_dependency "ruby-progressbar"
-  spec.add_development_dependency "appraisal", "~> 2.3.0"
-  spec.add_development_dependency "bundler", "~> 2.1"
-  spec.add_development_dependency "rake", "~> 13.0"
-  spec.add_development_dependency "rspec", "~> 3.10"
-  spec.add_development_dependency "temping", "~> 4.0"
-  spec.add_development_dependency "byebug"
-  spec.add_development_dependency "sqlite3", "~> 1.4"
-  spec.add_development_dependency "mysql2"
-  spec.add_development_dependency "pg"
-  spec.add_development_dependency "yard"
-  spec.add_development_dependency "reek"
 end
