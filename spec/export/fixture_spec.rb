@@ -67,15 +67,15 @@ describe LiveFixtures::Export::Fixture do
       end
 
       it_behaves_like 'a valid encoder for', Time.now do
-        let(:expected_value) { value.utc.to_s(:db) }
+        let(:expected_value) { value.utc.to_fs(:db) }
       end
 
       it_behaves_like 'a valid encoder for', DateTime.now do
-        let(:expected_value) { value.utc.to_s(:db) }
+        let(:expected_value) { value.utc.to_fs(:db) }
       end
 
       it_behaves_like 'a valid encoder for', Date.today do
-        let(:expected_value) { value.to_s(:db) }
+        let(:expected_value) { value.to_fs(:db) }
       end
 
       it_behaves_like 'a valid encoder for', 1337 do

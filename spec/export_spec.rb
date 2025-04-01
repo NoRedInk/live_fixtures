@@ -130,7 +130,7 @@ describe LiveFixtures::Export do
             trick: tricks_#{level.trick_id}
             rubric: |-
           #{level.rubric.to_yaml.indent(4)}
-            created_at: #{level.created_at.utc.to_s(:db)}
+            created_at: #{level.created_at.utc.to_fs(:db)}
             hash: #{level.hash}
 
         YML
