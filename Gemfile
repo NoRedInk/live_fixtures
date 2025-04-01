@@ -11,3 +11,6 @@ gem "temping", "~> 4.0"
 gem "byebug"
 gem "sqlite3", "~> 1.4"
 gem "yard"
+gem 'rubocop'
+gem 'rubocop-rake'
+gem 'rubocop-rspec'
