@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [4.0.0] - Unreleased
+## [4.0.0] - 2024-04-1
 ### Added
 Support for Ruby 3.2, active record 7
 
