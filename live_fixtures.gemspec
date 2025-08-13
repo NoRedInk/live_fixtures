@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activerecord', '>= 7.0', '< 8.0.0'
+  spec.add_dependency 'activerecord', '>= 7.0', '< 9.0.0'
   spec.add_dependency 'ruby-progressbar'
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
